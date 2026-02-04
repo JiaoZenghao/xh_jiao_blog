@@ -38,6 +38,20 @@ const hobbies = [
     </div>
   </section>
 
+  <section class="three" id="three">
+    <div class="three__content">
+      <p class="three__tag">Interactive</p>
+      <h2>Explore my orbit of ideas</h2>
+      <p>
+        Move your mouse (or drag on mobile) to gently steer the stars. This
+        Three.js scene is my digital playground.
+      </p>
+    </div>
+    <div class="three__stage">
+      <canvas id="orbit-canvas" aria-label="Interactive 3D starfield"></canvas>
+    </div>
+  </section>
+
   <section class="intro" id="introduction">
     <div>
       <h2>Introduction</h2>
@@ -76,6 +90,114 @@ const hobbies = [
     </div>
   </section>
 </div>
+
+<script type="module" is:inline>
+  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+
+  const canvas = document.querySelector('#orbit-canvas');
+  if (canvas) {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
+    camera.position.z = 6;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const geometry = new THREE.BufferGeometry();
+    const starCount = 900;
+    const positions = new Float32Array(starCount * 3);
+    const colors = new Float32Array(starCount * 3);
+
+    for (let i = 0; i < starCount; i += 1) {
+      const i3 = i * 3;
+      const radius = 3.2 + Math.random() * 2.4;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i3 + 1] = radius * Math.cos(phi);
+      positions[i3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+      colors[i3] = 0.6 + Math.random() * 0.4;
+      colors[i3 + 1] = 0.75 + Math.random() * 0.25;
+      colors[i3 + 2] = 1;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const material = new THREE.PointsMaterial({
+      size: 0.045,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.9,
+    });
+
+    const stars = new THREE.Points(geometry, material);
+    scene.add(stars);
+
+    const core = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(1.1, 1),
+      new THREE.MeshStandardMaterial({
+        color: '#2dd4bf',
+        emissive: '#0f172a',
+        emissiveIntensity: 0.3,
+        roughness: 0.35,
+        metalness: 0.6,
+      })
+    );
+    scene.add(core);
+
+    const glow = new THREE.PointLight('#7dd3fc', 1.1, 20);
+    glow.position.set(4, 3, 6);
+    scene.add(glow);
+
+    const ambient = new THREE.AmbientLight('#ffffff', 0.7);
+    scene.add(ambient);
+
+    const pointer = { x: 0, y: 0 };
+
+    const onPointerMove = (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
+      pointer.x = x * 0.6;
+      pointer.y = y * 0.6;
+    };
+
+    const onTouchMove = (event) => {
+      if (!event.touches.length) return;
+      onPointerMove(event.touches[0]);
+    };
+
+    canvas.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('touchmove', onTouchMove, { passive: true });
+
+    const resize = () => {
+      const { width, height } = canvas.parentElement.getBoundingClientRect();
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height, false);
+    };
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    const clock = new THREE.Clock();
+    const animate = () => {
+      const elapsed = clock.getElapsedTime();
+      stars.rotation.y = elapsed * 0.15 + pointer.x;
+      stars.rotation.x = elapsed * 0.08 + pointer.y;
+      core.rotation.y = elapsed * 0.35;
+      core.rotation.x = elapsed * 0.2;
+      camera.position.x += (pointer.x * 2 - camera.position.x) * 0.05;
+      camera.position.y += (pointer.y * 2 - camera.position.y) * 0.05;
+      camera.lookAt(0, 0, 0);
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+  }
+</script>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600&display=swap');
@@ -121,6 +243,51 @@ const hobbies = [
     background: #ffe0b8;
     bottom: -120px;
     left: -110px;
+  }
+
+  .three {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 32px;
+    align-items: center;
+  }
+
+  .three__content h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.9rem, 3vw, 2.6rem);
+    margin: 12px 0 16px;
+  }
+
+  .three__content p {
+    color: #475569;
+    line-height: 1.7;
+  }
+
+  .three__tag {
+    display: inline-flex;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #0f172a;
+    color: #f8fafc;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+  }
+
+  .three__stage {
+    background: radial-gradient(circle at top, rgba(59, 130, 246, 0.2), transparent 70%),
+      #0b1222;
+    border-radius: 24px;
+    padding: 18px;
+    min-height: 320px;
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.18),
+      0 24px 48px rgba(15, 23, 42, 0.3);
+  }
+
+  .three__stage canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 18px;
   }
 
   .hero {
