@@ -29,26 +29,12 @@ const hobbies = [
         <a class="cta ghost" href="#hobby">My hobbies</a>
       </div>
     </div>
-    <div class="hero__image">
-      <img
-        src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"
-        alt="Sunny ocean view with a long bridge in the distance."
-      />
-      <span class="hero__badge">Beach day memory</span>
-    </div>
-  </section>
-
-  <section class="three" id="three">
-    <div class="three__content">
-      <p class="three__tag">Interactive</p>
-      <h2>Explore my orbit of ideas</h2>
-      <p>
-        Move your mouse (or drag on mobile) to gently steer the stars. This
-        Three.js scene is my digital playground.
-      </p>
-    </div>
-    <div class="three__stage">
-      <canvas id="orbit-canvas" aria-label="Interactive 3D starfield"></canvas>
+    <div class="hero__scene" aria-hidden="true">
+      <canvas id="hero-canvas"></canvas>
+      <div class="hero__glass">
+        <span class="hero__badge">Coastal night drive</span>
+        <p>Drag to drift through the glow.</p>
+      </div>
     </div>
   </section>
 
@@ -94,7 +80,7 @@ const hobbies = [
 <script type="module" is:inline>
   import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
-  const canvas = document.querySelector('#orbit-canvas');
+  const canvas = document.querySelector('#hero-canvas');
   if (canvas) {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
@@ -245,51 +231,6 @@ const hobbies = [
     left: -110px;
   }
 
-  .three {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 32px;
-    align-items: center;
-  }
-
-  .three__content h2 {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(1.9rem, 3vw, 2.6rem);
-    margin: 12px 0 16px;
-  }
-
-  .three__content p {
-    color: #475569;
-    line-height: 1.7;
-  }
-
-  .three__tag {
-    display: inline-flex;
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: #0f172a;
-    color: #f8fafc;
-    font-size: 0.85rem;
-    letter-spacing: 0.02em;
-  }
-
-  .three__stage {
-    background: radial-gradient(circle at top, rgba(59, 130, 246, 0.2), transparent 70%),
-      #0b1222;
-    border-radius: 24px;
-    padding: 18px;
-    min-height: 320px;
-    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.18),
-      0 24px 48px rgba(15, 23, 42, 0.3);
-  }
-
-  .three__stage canvas {
-    width: 100%;
-    height: 100%;
-    display: block;
-    border-radius: 18px;
-  }
-
   .hero {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -348,31 +289,63 @@ const hobbies = [
     border: 1px solid #cbd5f5;
   }
 
-  .hero__image {
+  .hero__scene {
     position: relative;
-    padding: 24px;
-    background: #ffffff;
-    border-radius: 24px;
-    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.12);
+    border-radius: 28px;
+    overflow: hidden;
+    min-height: 420px;
+    background: radial-gradient(circle at top, rgba(59, 130, 246, 0.3), transparent 65%),
+      linear-gradient(135deg, #0b1222 0%, #101a2e 40%, #0f172a 100%);
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.18),
+      0 30px 60px rgba(15, 23, 42, 0.35);
   }
 
-  .hero__image img {
+  .hero__scene canvas {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    height: auto;
-    border-radius: 18px;
+    height: 100%;
     display: block;
-    object-fit: cover;
+  }
+
+  .hero__scene::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 70% 20%, rgba(125, 211, 252, 0.4), transparent 55%),
+      radial-gradient(circle at 20% 80%, rgba(45, 212, 191, 0.25), transparent 55%);
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  .hero__glass {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    display: grid;
+    gap: 8px;
+    max-width: 220px;
+    padding: 14px 16px;
+    background: rgba(15, 23, 42, 0.72);
+    color: #f8fafc;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    backdrop-filter: blur(10px);
+  }
+
+  .hero__glass p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: rgba(226, 232, 240, 0.85);
   }
 
   .hero__badge {
-    position: absolute;
-    bottom: 12px;
-    right: 16px;
-    background: rgba(15, 23, 42, 0.85);
-    color: #f8fafc;
-    padding: 6px 12px;
-    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
   }
 
   .intro {
@@ -469,8 +442,15 @@ const hobbies = [
       align-items: flex-start;
     }
 
-    .hero__image {
-      padding: 16px;
+    .hero__scene {
+      min-height: 320px;
+    }
+
+    .hero__glass {
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      max-width: none;
     }
   }
 </style>
