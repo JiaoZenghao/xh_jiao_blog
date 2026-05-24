@@ -11,6 +11,9 @@ importers:
       astro:
         specifier: ^5.17.2
         version: 5.17.2(rollup@4.55.1)(typescript@5.9.3)
+      three:
+        specifier: ^0.184.0
+        version: 0.184.0
 
 packages:
 
@@ -1391,6 +1394,9 @@ packages:
     resolution: {integrity: sha512-VvrHQ+9uniE+Mvx3+C9IEe/lWasXCU0nXMY2kZeLrHNICuRiC8uMPyM14UEaMOFA5mhyQqEkB02VoQ16n3DLaw==}
     engines: {node: '>=16'}
     hasBin: true
+
+  three@0.184.0:
+    resolution: {integrity: sha512-wtTRjG92pM5eUg/KuUnHsqSAlPM296brTOcLgMRqEeylYTh/CdtvKUvCyyCQTzFuStieWxvZb8mVTMvdPyUpxg==}
 
   tiny-inflate@1.0.3:
     resolution: {integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==}
@@ -3243,6 +3249,8 @@ snapshots:
       csso: 5.0.5
       picocolors: 1.1.1
       sax: 1.4.4
+
+  three@0.184.0: {}
 
   tiny-inflate@1.0.3: {}
 

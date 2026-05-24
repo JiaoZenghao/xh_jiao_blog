@@ -13,11 +13,32 @@ const hobbies = [
     detail: 'Space facts, kid science videos, and fun experiments at home.',
   },
 ];
+
+const navItems = [
+  { label: '[M] MEET ME', href: '#introduction' },
+  { label: '[H] HOBBIES', href: '#hobby' },
+  { label: '[T] TOP', href: '#hero' },
+];
+
+const sections = ['HERO', 'INTRODUCTION', 'QUICK FACTS', 'HOBBY', 'ADVENTURES'];
 ---
 
-<div class="page">
+<main class="vlog-page">
+  <canvas class="vlog-scene" data-vlog-scene aria-hidden="true"></canvas>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <header class="topbar" aria-label="Primary">
+    <p>SCROLL OR PRESS DOWN AND UP</p>
+    <nav>
+      {navItems.map((item) => (
+        <a href={item.href}>{item.label}</a>
+      ))}
+    </nav>
+  </header>
+
   <section class="hero" id="hero">
-    <div class="hero__content">
+    <p class="brand">TT VLOG</p>
+    <div class="hero__copy">
       <p class="hero__tag">Personal vlog · Age 11</p>
       <h1>Hi! I share my days, ideas, and mini adventures.</h1>
       <p class="hero__lead">
@@ -29,16 +50,19 @@ const hobbies = [
         <a class="cta ghost" href="#hobby">My hobbies</a>
       </div>
     </div>
-    <div class="hero__scene" aria-hidden="true">
-      <canvas id="hero-canvas"></canvas>
-      <div class="hero__glass">
-        <span class="hero__badge">Coastal night drive</span>
-        <p>Drag to drift through the glow.</p>
-      </div>
-    </div>
   </section>
 
-  <section class="intro" id="introduction">
+  <aside class="rail" aria-label="Page sections">
+    <ol>
+      {sections.map((section, index) => (
+        <li class={index === 0 ? 'is-active' : ''}>
+          <a href={index === 1 || index === 2 ? '#introduction' : index === 3 ? '#hobby' : '#hero'}>{section}</a>
+        </li>
+      ))}
+    </ol>
+  </aside>
+
+  <section class="intro section-band" id="introduction">
     <div>
       <h2>Introduction</h2>
       <p>
@@ -61,7 +85,7 @@ const hobbies = [
     </div>
   </section>
 
-  <section class="hobby" id="hobby">
+  <section class="hobby section-band" id="hobby">
     <header>
       <h2>Hobby</h2>
       <p>These are the things that make my weekends feel awesome.</p>
@@ -75,172 +99,188 @@ const hobbies = [
       ))}
     </div>
   </section>
-</div>
+</main>
 
-<script type="module" is:inline>
-  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+<script>
+  import * as THREE from 'three';
 
-  const canvas = document.querySelector('#hero-canvas');
-  if (canvas) {
+  const canvas = document.querySelector('[data-vlog-scene]');
+
+  if (canvas instanceof HTMLCanvasElement) {
     const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog('#0b1222', 6, 18);
+    scene.fog = new THREE.FogExp2(0x020506, 0.055);
 
-    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-    camera.position.set(0, 1.2, 7.5);
+    const camera = new THREE.PerspectiveCamera(62, 1, 0.1, 180);
+    camera.position.set(0, 8.5, 17);
+    camera.lookAt(0, 0.3, -28);
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 0);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: false,
+      powerPreference: 'high-performance',
+    });
+    renderer.setClearColor(0x020304, 1);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.25;
 
-    const ambient = new THREE.AmbientLight('#6fa8ff', 0.6);
-    scene.add(ambient);
+    const pointer = new THREE.Vector2();
+    const eased = new THREE.Vector2();
 
-    const keyLight = new THREE.DirectionalLight('#8dd5ff', 1.1);
-    keyLight.position.set(5, 6, 4);
-    scene.add(keyLight);
+    const makePoints = (count, createPosition, createColor, size) => {
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(count * 3);
+      const colors = new Float32Array(count * 3);
 
-    const rimLight = new THREE.PointLight('#2dd4bf', 1.4, 20);
-    rimLight.position.set(-4, 2, 6);
-    scene.add(rimLight);
+      for (let i = 0; i < count; i += 1) {
+        const position = createPosition();
+        const color = createColor(position);
+        const i3 = i * 3;
+        positions[i3] = position.x;
+        positions[i3 + 1] = position.y;
+        positions[i3 + 2] = position.z;
+        colors[i3] = color.r;
+        colors[i3 + 1] = color.g;
+        colors[i3 + 2] = color.b;
+      }
 
-    const sky = new THREE.Mesh(
-      new THREE.SphereGeometry(20, 32, 32),
-      new THREE.MeshBasicMaterial({
-        color: '#0b1222',
-        side: THREE.BackSide,
-      })
-    );
-    scene.add(sky);
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-    const starGeometry = new THREE.BufferGeometry();
-    const starCount = 1400;
-    const positions = new Float32Array(starCount * 3);
-    const colors = new Float32Array(starCount * 3);
-
-    for (let i = 0; i < starCount; i += 1) {
-      const i3 = i * 3;
-      const radius = 7 + Math.random() * 6;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
-      positions[i3 + 1] = radius * Math.cos(phi) * 0.7;
-      positions[i3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
-      colors[i3] = 0.7 + Math.random() * 0.3;
-      colors[i3 + 1] = 0.8 + Math.random() * 0.2;
-      colors[i3 + 2] = 1;
-    }
-
-    starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    starGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-    const starField = new THREE.Points(
-      starGeometry,
-      new THREE.PointsMaterial({
-        size: 0.04,
+      const material = new THREE.PointsMaterial({
+        size,
         vertexColors: true,
         transparent: true,
-        opacity: 0.85,
-      })
-    );
-    scene.add(starField);
+        opacity: 0.92,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true,
+      });
 
-    const waveGeometry = new THREE.PlaneGeometry(16, 10, 120, 80);
-    const waveMaterial = new THREE.MeshStandardMaterial({
-      color: '#0f3b5c',
-      metalness: 0.15,
-      roughness: 0.35,
-      emissive: '#0b1222',
-      emissiveIntensity: 0.35,
-    });
-    const waves = new THREE.Mesh(waveGeometry, waveMaterial);
-    waves.rotation.x = -Math.PI / 2.2;
-    waves.position.y = -0.7;
-    scene.add(waves);
-
-    const orb = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(1.1, 2),
-      new THREE.MeshStandardMaterial({
-        color: '#2dd4bf',
-        emissive: '#0ea5e9',
-        emissiveIntensity: 0.6,
-        roughness: 0.2,
-        metalness: 0.8,
-      })
-    );
-    orb.position.set(0, 0.4, 0);
-    scene.add(orb);
-
-    const halo = new THREE.Mesh(
-      new THREE.TorusGeometry(1.8, 0.08, 16, 120),
-      new THREE.MeshStandardMaterial({
-        color: '#7dd3fc',
-        emissive: '#7dd3fc',
-        emissiveIntensity: 0.9,
-        roughness: 0.3,
-        metalness: 0.6,
-      })
-    );
-    halo.rotation.x = Math.PI / 2.5;
-    halo.position.y = 0.3;
-    scene.add(halo);
-
-    const pointer = { x: 0, y: 0 };
-
-    const onPointerMove = (event) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
-      pointer.x = x;
-      pointer.y = y;
+      return new THREE.Points(geometry, material);
     };
 
-    const onTouchMove = (event) => {
-      if (!event.touches.length) return;
-      onPointerMove(event.touches[0]);
+    const field = makePoints(
+      26000,
+      () => {
+        const z = -8 - Math.random() * 78;
+        const spread = 26 + Math.abs(z) * 1.35;
+        return new THREE.Vector3((Math.random() - 0.5) * spread, -1.65, z);
+      },
+      (position) => {
+        const horizon = THREE.MathUtils.clamp((Math.abs(position.z) - 8) / 78, 0, 1);
+        const color = new THREE.Color().setHSL(0.26, 0.92, 0.52 + horizon * 0.12);
+        if (Math.random() > 0.78) color.setRGB(0.9, 0.98, 1);
+        return color;
+      },
+      0.09
+    );
+    field.rotation.x = -0.055;
+    scene.add(field);
+
+    const stars = makePoints(
+      1400,
+      () => {
+        const radius = 35 + Math.random() * 70;
+        const theta = Math.random() * Math.PI * 2;
+        const y = 4 + Math.random() * 38;
+        return new THREE.Vector3(Math.cos(theta) * radius, y, -Math.abs(Math.sin(theta) * radius) - 12);
+      },
+      () => new THREE.Color(0.68 + Math.random() * 0.32, 0.86 + Math.random() * 0.14, 0.72 + Math.random() * 0.28),
+      0.09
+    );
+    scene.add(stars);
+
+    const createTrack = (color, width, offset, opacity) => {
+      const points = [];
+      for (let i = 0; i < 180; i += 1) {
+        const t = i / 179;
+        const z = 6 - t * 80;
+        const curve = Math.sin(t * Math.PI * 1.34 + offset) * (5.2 + t * 16);
+        points.push(new THREE.Vector3(curve - 8.5 + t * 16, -1.2 + t * 0.34, z));
+      }
+
+      const geometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 360, width, 8, false);
+      const material = new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+
+      return new THREE.Mesh(geometry, material);
     };
 
-    canvas.addEventListener('pointermove', onPointerMove);
-    canvas.addEventListener('touchmove', onTouchMove, { passive: true });
+    const whiteTrack = createTrack(0xf8fff8, 0.08, 0.05, 0.95);
+    const redTrack = createTrack(0xff2c1f, 0.055, 0.18, 0.74);
+    const hotTrack = createTrack(0xfff7e6, 0.16, 0.08, 0.34);
+    scene.add(whiteTrack, redTrack, hotTrack);
 
-    const basePositions = waveGeometry.attributes.position.array.slice();
+    const horizon = new THREE.Mesh(
+      new THREE.PlaneGeometry(180, 18),
+      new THREE.MeshBasicMaterial({
+        color: 0x96ff3d,
+        transparent: true,
+        opacity: 0.08,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      })
+    );
+    horizon.position.set(0, -1.48, -52);
+    horizon.rotation.x = -Math.PI / 2;
+    scene.add(horizon);
+
+    const redGlow = new THREE.PointLight(0xff392c, 2.2, 38);
+    redGlow.position.set(-8, -0.5, -5);
+    scene.add(redGlow);
 
     const resize = () => {
-      const { width, height } = canvas.parentElement.getBoundingClientRect();
+      const width = window.innerWidth;
+      const height = window.innerHeight;
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height, false);
     };
 
+    const onPointerMove = (event) => {
+      pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+      pointer.y = -((event.clientY / window.innerHeight) * 2 - 1);
+    };
+
     window.addEventListener('resize', resize);
+    window.addEventListener('pointermove', onPointerMove);
     resize();
 
     const clock = new THREE.Clock();
     const animate = () => {
       const elapsed = clock.getElapsedTime();
-      const positions = waveGeometry.attributes.position;
+      eased.lerp(pointer, 0.045);
 
-      for (let i = 0; i < positions.count; i += 1) {
-        const ix = i * 3;
-        const x = basePositions[ix];
-        const y = basePositions[ix + 1];
-        positions.array[ix + 2] =
-          Math.sin(elapsed * 1.4 + x * 0.9) * 0.12 +
-          Math.cos(elapsed * 1.1 + y * 1.2) * 0.1;
+      const fieldPositions = field.geometry.attributes.position.array;
+      for (let i = 0; i < fieldPositions.length; i += 3) {
+        fieldPositions[i + 2] += 0.055;
+        if (fieldPositions[i + 2] > 8) fieldPositions[i + 2] = -86;
       }
-      positions.needsUpdate = true;
-      waveGeometry.computeVertexNormals();
+      field.geometry.attributes.position.needsUpdate = true;
 
-      starField.rotation.y = elapsed * 0.08 + pointer.x * 0.2;
-      starField.rotation.x = elapsed * 0.05 + pointer.y * 0.1;
-      orb.rotation.y = elapsed * 0.5;
-      orb.rotation.x = elapsed * 0.25;
-      halo.rotation.z = elapsed * 0.25;
+      stars.rotation.y = elapsed * 0.012 + eased.x * 0.025;
+      stars.material.opacity = 0.66 + Math.sin(elapsed * 0.8) * 0.18;
+      whiteTrack.material.opacity = 0.72 + Math.sin(elapsed * 3.2) * 0.22;
+      redTrack.material.opacity = 0.48 + Math.sin(elapsed * 4.1 + 1.4) * 0.22;
+      hotTrack.material.opacity = 0.2 + Math.sin(elapsed * 2.3) * 0.12;
+      whiteTrack.position.z = Math.sin(elapsed * 1.2) * 0.32;
+      redTrack.position.z = Math.cos(elapsed * 1.45) * 0.5;
+      horizon.material.opacity = 0.07 + Math.sin(elapsed * 1.4) * 0.035;
+      redGlow.position.x = -8 + Math.sin(elapsed * 1.8) * 5;
+      redGlow.position.z = -4 - Math.abs(Math.sin(elapsed * 1.15)) * 18;
 
-      camera.position.x += (pointer.x * 1.2 - camera.position.x) * 0.05;
-      camera.position.y += (1.2 + pointer.y * 0.6 - camera.position.y) * 0.05;
-      camera.lookAt(0, 0.2, 0);
+      camera.position.x = eased.x * 1.1;
+      camera.position.y = 8.4 + eased.y * 0.55 + Math.sin(elapsed * 0.42) * 0.12;
+      camera.position.z = 17 + Math.sin(elapsed * 0.38) * 0.34;
+      camera.lookAt(eased.x * 1.8, 0.1 + eased.y * 0.3, -30);
 
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
@@ -251,271 +291,423 @@ const hobbies = [
 </script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+  :global(html) {
+    background: #020304;
+    scroll-behavior: smooth;
+  }
 
   :global(body) {
     margin: 0;
-    background: radial-gradient(circle at top, #eaf4ff 0%, #fefefe 55%, #fff7e8 100%);
-    color: #0f172a;
+    overflow-x: hidden;
+    background: #020304;
+    color: #f7fff0;
   }
 
-  .page {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    padding: 72px 6vw 96px;
-    display: flex;
-    flex-direction: column;
-    gap: 96px;
-    min-height: 100vh;
+  .vlog-page {
+    --acid: #b9fb4b;
+    --panel: rgba(17, 22, 17, 0.7);
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    min-height: 180vh;
     position: relative;
     overflow: hidden;
+    background:
+      radial-gradient(circle at 56% 47%, rgba(131, 219, 255, 0.26), transparent 26rem),
+      linear-gradient(180deg, #020304 0%, #061014 58%, #020304 100%);
+    font-family: 'Space Grotesk', system-ui, sans-serif;
   }
 
-  .page::before,
-  .page::after {
-    content: '';
-    position: absolute;
-    border-radius: 999px;
-    filter: blur(0px);
-    opacity: 0.55;
-    z-index: -1;
+  .vlog-scene,
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
   }
 
-  .page::before {
-    width: 320px;
-    height: 320px;
-    background: #c8f2ff;
-    top: -120px;
-    right: -140px;
+  .vlog-scene {
+    z-index: 0;
   }
 
-  .page::after {
-    width: 260px;
-    height: 260px;
-    background: #ffe0b8;
-    bottom: -120px;
-    left: -110px;
+  .scanlines {
+    z-index: 1;
+    pointer-events: none;
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      radial-gradient(circle at 50% 48%, transparent 0 36%, rgba(0, 0, 0, 0.34) 68%, rgba(0, 0, 0, 0.74) 100%);
+    background-size: 100% 4px, 100% 100%;
+    mix-blend-mode: screen;
+    opacity: 0.46;
+  }
+
+  .topbar {
+    position: fixed;
+    z-index: 4;
+    inset: 22px 22px auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: rgba(220, 232, 235, 0.64);
+  }
+
+  .topbar p {
+    margin: 0;
+  }
+
+  .topbar nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 7px;
+  }
+
+  .topbar a,
+  .cta {
+    color: rgba(235, 244, 247, 0.86);
+    text-decoration: none;
+    background: rgba(32, 40, 45, 0.82);
+    border: 1px solid rgba(168, 188, 190, 0.16);
+    padding: 8px 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    transition: color 160ms ease, background 160ms ease, transform 160ms ease;
+  }
+
+  .topbar a:hover,
+  .cta:hover {
+    color: #0a0f0b;
+    background: var(--acid);
+    transform: translateY(-1px);
   }
 
   .hero {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 48px;
-    align-items: center;
+    grid-template-rows: minmax(150px, 28vh) 1fr;
+    align-items: start;
+    padding: 86px 32px 0;
+    box-sizing: border-box;
   }
 
-  .hero__content h1 {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(2.4rem, 3.5vw, 3.6rem);
-    line-height: 1.1;
-    margin: 16px 0;
+  .brand {
+    margin: 0;
+    color: var(--acid);
+    font-family: 'Anton', Impact, sans-serif;
+    font-size: clamp(92px, 18vw, 260px);
+    line-height: 0.78;
+    transform: scaleX(1.22);
+    transform-origin: left top;
+    text-shadow:
+      0 0 22px rgba(185, 251, 75, 0.18),
+      0 0 68px rgba(185, 251, 75, 0.16);
+    animation: brandIgnition 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    user-select: none;
   }
 
-  .hero__lead {
-    font-size: 1.1rem;
-    color: #334155;
-    max-width: 520px;
+  .hero__copy {
+    width: min(1040px, calc(100vw - 32px));
+    justify-self: center;
+    align-self: start;
+    margin-top: clamp(10px, 8vh, 86px);
+    text-align: center;
+    animation: copyRise 900ms 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   .hero__tag {
     display: inline-flex;
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: #0f172a;
-    color: #f8fafc;
-    font-size: 0.9rem;
-    letter-spacing: 0.02em;
+    margin: 0 0 16px;
+    color: var(--acid);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .hero h1 {
+    margin: 0;
+    font-size: clamp(46px, 6vw, 86px);
+    line-height: 0.98;
+    color: #fbfff7;
+    text-shadow:
+      0 0 6px rgba(255, 255, 255, 0.95),
+      0 0 20px rgba(236, 255, 248, 0.62),
+      0 0 44px rgba(117, 212, 255, 0.34);
+  }
+
+  .hero__lead {
+    width: min(590px, 100%);
+    margin: 22px auto 0;
+    color: rgba(235, 244, 247, 0.78);
+    font-size: 16px;
+    line-height: 1.55;
+    text-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
   }
 
   .hero__cta {
     display: flex;
-    gap: 16px;
-    margin-top: 24px;
+    justify-content: center;
     flex-wrap: wrap;
-  }
-
-  .cta {
-    text-decoration: none;
-    padding: 12px 20px;
-    border-radius: 999px;
-    background: #0f172a;
-    color: #f8fafc;
-    font-weight: 600;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .cta:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.16);
+    gap: 10px;
+    margin-top: 26px;
   }
 
   .cta.ghost {
-    background: transparent;
-    color: #0f172a;
-    border: 1px solid #cbd5f5;
+    background: rgba(5, 7, 8, 0.58);
   }
 
-  .hero__scene {
+  .rail {
+    position: fixed;
+    z-index: 4;
+    left: 24px;
+    bottom: 26px;
+    width: 186px;
+    padding: 18px 18px 18px 36px;
+    box-sizing: border-box;
+    background:
+      radial-gradient(circle at 12% 10%, rgba(185, 251, 75, 0.22), transparent 36%),
+      radial-gradient(circle at 100% 100%, rgba(255, 70, 54, 0.26), transparent 40%),
+      var(--panel);
+    border: 1px solid rgba(219, 255, 197, 0.08);
+    backdrop-filter: blur(16px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 22px 60px rgba(0, 0, 0, 0.38);
+  }
+
+  .rail ol {
+    list-style: none;
+    display: grid;
+    gap: 13px;
+    padding: 0;
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .rail li {
     position: relative;
-    border-radius: 28px;
-    overflow: hidden;
-    min-height: 420px;
-    background: radial-gradient(circle at top, rgba(59, 130, 246, 0.3), transparent 65%),
-      linear-gradient(135deg, #0b1222 0%, #101a2e 40%, #0f172a 100%);
-    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.18),
-      0 30px 60px rgba(15, 23, 42, 0.35);
   }
 
-  .hero__scene canvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-
-  .hero__scene::after {
+  .rail li::before {
     content: '';
     position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 70% 20%, rgba(125, 211, 252, 0.4), transparent 55%),
-      radial-gradient(circle at 20% 80%, rgba(45, 212, 191, 0.25), transparent 55%);
-    mix-blend-mode: screen;
-    pointer-events: none;
+    left: -20px;
+    top: 0.55em;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(238, 246, 244, 0.8);
+    box-shadow: 0 0 8px rgba(238, 246, 244, 0.65);
   }
 
-  .hero__glass {
-    position: absolute;
-    right: 24px;
-    bottom: 24px;
-    display: grid;
-    gap: 8px;
-    max-width: 220px;
-    padding: 14px 16px;
-    background: rgba(15, 23, 42, 0.72);
-    color: #f8fafc;
-    border-radius: 16px;
-    border: 1px solid rgba(148, 163, 184, 0.3);
-    backdrop-filter: blur(10px);
+  .rail li.is-active::before {
+    width: 11px;
+    height: 11px;
+    left: -24px;
+    top: 0.18em;
+    background: var(--acid);
+    box-shadow: 0 0 18px rgba(185, 251, 75, 0.95);
   }
 
-  .hero__glass p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: rgba(226, 232, 240, 0.85);
+  .rail a {
+    color: rgba(240, 246, 242, 0.48);
+    text-decoration: none;
   }
 
-  .hero__badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.01em;
+  .rail .is-active a {
+    color: #f8fff1;
+  }
+
+  .section-band {
+    position: relative;
+    z-index: 2;
+    padding: 12vh 8vw;
+    background: linear-gradient(180deg, rgba(3, 5, 4, 0.72), rgba(3, 5, 4, 0.94));
   }
 
   .intro {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 32px;
+    grid-template-columns: minmax(0, 1.3fr) minmax(240px, 0.7fr);
+    gap: 42px;
     align-items: start;
   }
 
   .intro h2,
   .hobby h2 {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(1.8rem, 3vw, 2.4rem);
-    margin-bottom: 16px;
+    margin: 0 0 18px;
+    color: #f8fff2;
+    font-size: clamp(40px, 6vw, 84px);
+    line-height: 0.98;
+    text-shadow: 0 0 28px rgba(185, 251, 75, 0.12);
   }
 
-  .intro p {
-    color: #475569;
-    line-height: 1.7;
+  .intro p,
+  .hobby header p,
+  .hobby__card p {
+    color: rgba(235, 244, 247, 0.74);
+    line-height: 1.75;
+  }
+
+  .intro__card,
+  .hobby__card {
+    background: rgba(17, 22, 17, 0.72);
+    border: 1px solid rgba(219, 255, 197, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 22px 60px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(14px);
   }
 
   .intro__card {
-    background: #f8fafc;
-    border-radius: 20px;
     padding: 24px;
-    border: 1px solid #e2e8f0;
+  }
+
+  .intro__card h3,
+  .hobby__card h3 {
+    margin: 0 0 14px;
+    color: var(--acid);
+    font-family: var(--mono);
+    font-size: 14px;
   }
 
   .intro__card ul {
     list-style: none;
-    padding: 0;
-    margin: 0;
     display: grid;
     gap: 12px;
-    color: #1f2937;
+    padding: 0;
+    margin: 0;
   }
 
   .intro__card li {
-    padding: 10px 14px;
-    background: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    color: rgba(247, 255, 240, 0.86);
+    border-top: 1px solid rgba(219, 255, 197, 0.12);
+    padding-top: 12px;
   }
 
   .hobby header {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 620px;
-  }
-
-  .hobby header p {
-    color: #475569;
+    max-width: 760px;
   }
 
   .hobby__grid {
-    margin-top: 28px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 30px;
   }
 
   .hobby__card {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 20px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
-    transition: transform 0.2s ease;
-  }
-
-  .hobby__card:hover {
-    transform: translateY(-4px);
-  }
-
-  .hobby__card h3 {
-    margin: 0 0 8px;
-    font-size: 1.1rem;
+    padding: 22px;
   }
 
   .hobby__card p {
     margin: 0;
-    color: #475569;
-    line-height: 1.6;
   }
 
-  @media (max-width: 720px) {
-    .page {
-      padding: 56px 6vw 80px;
+  @keyframes brandIgnition {
+    from {
+      opacity: 0;
+      filter: blur(18px);
+      transform: translateY(-28px) scaleX(1.22);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0) scaleX(1.22);
+    }
+  }
+
+  @keyframes copyRise {
+    from {
+      opacity: 0;
+      filter: blur(10px);
+      transform: translateY(34px);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 840px) {
+    .topbar {
+      inset: 16px 14px auto;
     }
 
-    .hero__cta {
-      flex-direction: column;
-      align-items: flex-start;
+    .topbar p {
+      display: none;
     }
 
-    .hero__scene {
-      min-height: 320px;
+    .topbar nav {
+      width: 100%;
+      justify-content: flex-start;
     }
 
-    .hero__glass {
-      left: 16px;
-      right: 16px;
-      bottom: 16px;
-      max-width: none;
+    .topbar a {
+      padding: 6px 7px;
+      font-size: 10px;
+    }
+
+    .hero {
+      grid-template-rows: auto 1fr;
+      padding: 74px 18px 0;
+    }
+
+    .brand {
+      font-size: clamp(66px, 24vw, 118px);
+      transform: scaleX(1.05);
+    }
+
+    .hero__copy {
+      margin-top: 12vh;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 12vw, 58px);
+    }
+
+    .hero__lead {
+      font-size: 14px;
+    }
+
+    .rail {
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      width: auto;
+      padding: 12px 14px;
+    }
+
+    .rail ol {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px 12px;
+      font-size: 9px;
+    }
+
+    .rail li::before {
+      display: none;
+    }
+
+    .intro,
+    .hobby__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .section-band {
+      padding: 10vh 6vw;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand,
+    .hero__copy {
+      animation: none;
     }
   }
 </style>
