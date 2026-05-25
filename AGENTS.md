@@ -64,13 +64,13 @@ pnpm dev
 <claude-mem-context>
 # Memory Context
 
-# [xh_jiao_blog] recent context, 2026-05-24 12:18pm GMT+8
+# [xh_jiao_blog] recent context, 2026-05-25 8:13pm GMT+8
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 28 obs (9,249t read) | 99,502t work | 91% savings
+Stats: 33 obs (10,940t read) | 146,284t work | 93% savings
 
 ### May 24, 2026
 73 11:48a 🔵 Astro Blog Project Structure Identified
@@ -103,6 +103,11 @@ S8 Redesign Welcome.astro to match Remix.run website style, especially the anima
 95 " 🔵 Astro blog build succeeds with large JS chunk warning from Welcome.astro particle script
 99 12:14p 🔴 Orphaned Playwright/Chrome processes manually killed after screenshot session
 100 12:16p ✅ Removed Playwright Dev Dependency from xh_jiao_blog
+101 12:17p 🟣 Three.js Added to Astro Blog Project
+102 " 🔵 Three.js Bundle Size Warning in Astro Build
+103 12:20p 🟣 TT Vlog Welcome Page Built with Three.js WebGL Background
+104 " 🔵 Playwright Not Installed in xh_jiao_blog Project
+105 " 🟣 Flash-Free Theme Detection Script Added to Layout.astro
 
-Access 100k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 146k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>
