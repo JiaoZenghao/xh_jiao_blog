@@ -34,6 +34,10 @@ test('adventure selectors disable motion for reduced-motion users', () => {
     source,
     /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.adventure__select \{[\s\S]*?transition: none;[\s\S]*?transform: none;/
   );
+  assert.match(
+    source,
+    /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.adventure__select:hover,\s*\n\s*\.adventure__select:active\s*\{[\s\S]*?transform: none;/
+  );
 });
 
 test('rail links meet the minimum touch target size', () => {
