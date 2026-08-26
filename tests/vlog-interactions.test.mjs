@@ -1,0 +1,31 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  chooseActiveSection,
+  getCardTilt,
+  getScrollProgress,
+} from '../src/scripts/vlog-interactions.mjs';
+
+test('getScrollProgress clamps document progress to zero through one', () => {
+  assert.equal(getScrollProgress(-20, 2000, 1000), 0);
+  assert.equal(getScrollProgress(500, 2000, 1000), 0.5);
+  assert.equal(getScrollProgress(1500, 2000, 1000), 1);
+  assert.equal(getScrollProgress(20, 800, 800), 0);
+});
+
+test('chooseActiveSection selects the intersecting section with the greatest ratio', () => {
+  const active = chooseActiveSection([
+    { id: 'hero', isIntersecting: true, intersectionRatio: 0.2 },
+    { id: 'introduction', isIntersecting: true, intersectionRatio: 0.65 },
+    { id: 'hobby', isIntersecting: false, intersectionRatio: 0.9 },
+  ]);
+  assert.equal(active, 'introduction');
+  assert.equal(chooseActiveSection([]), null);
+});
+
+test('getCardTilt centers at zero and clamps edge rotation', () => {
+  const rect = { left: 100, top: 50, width: 200, height: 100 };
+  assert.deepEqual(getCardTilt(200, 100, rect), { rotateX: 0, rotateY: 0 });
+  assert.deepEqual(getCardTilt(300, 50, rect, 6), { rotateX: 6, rotateY: 6 });
+  assert.deepEqual(getCardTilt(0, 300, rect, 6), { rotateX: -6, rotateY: -6 });
+});
