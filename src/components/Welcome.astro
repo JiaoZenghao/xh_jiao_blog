@@ -3,14 +3,38 @@ const hobbies = [
   {
     title: 'Sports + Outdoors',
     detail: 'Basketball, swimming, beach walks, and weekend bike rides.',
+    extra: 'I like learning one small new move or route every time I head outside.',
   },
   {
     title: 'Games + Building',
     detail: 'LEGO builds, Minecraft creative mode, and puzzle challenges.',
+    extra: 'My favorite projects start with a big idea and turn into something surprising.',
   },
   {
     title: 'Curious Stuff',
     detail: 'Space facts, kid science videos, and fun experiments at home.',
+    extra: 'If I find a cool question, I usually keep digging until I know the answer.',
+  },
+];
+
+const adventures = [
+  {
+    title: 'Aquarium After Dark',
+    place: 'Ocean Discovery Hall',
+    highlight: 'Watching jellyfish glow like tiny spaceships.',
+    lesson: 'The quietest animals can still be the most amazing.',
+  },
+  {
+    title: 'Mountain Train Mission',
+    place: 'Cloudline Railway',
+    highlight: 'Counting tunnels while the valley disappeared into clouds.',
+    lesson: 'A slow journey gives you more time to notice things.',
+  },
+  {
+    title: 'Beach Bike Sunrise',
+    place: 'East Bay Boardwalk',
+    highlight: 'Racing the sunrise and stopping for warm breakfast buns.',
+    lesson: 'Starting early can turn an ordinary day into an adventure.',
   },
 ];
 
@@ -20,7 +44,14 @@ const navItems = [
   { label: '[T] TOP', href: '#hero' },
 ];
 
-const sections = ['HERO', 'INTRODUCTION', 'QUICK FACTS', 'HOBBY', 'ADVENTURES'];
+const sections = [
+  { label: 'HERO', href: '#hero' },
+  { label: 'INTRODUCTION', href: '#introduction' },
+  { label: 'HOBBY', href: '#hobby' },
+  { label: 'ADVENTURES', href: '#adventures' },
+];
+
+const featuredAdventure = adventures[0];
 ---
 
 <main class="vlog-page">
@@ -36,7 +67,7 @@ const sections = ['HERO', 'INTRODUCTION', 'QUICK FACTS', 'HOBBY', 'ADVENTURES'];
     </nav>
   </header>
 
-  <section class="hero" id="hero">
+  <section class="hero" id="hero" data-section>
     <p class="brand">TT VLOG</p>
     <div class="hero__copy">
       <p class="hero__tag">Personal vlog · Age 11</p>
@@ -56,13 +87,13 @@ const sections = ['HERO', 'INTRODUCTION', 'QUICK FACTS', 'HOBBY', 'ADVENTURES'];
     <ol>
       {sections.map((section, index) => (
         <li class={index === 0 ? 'is-active' : ''}>
-          <a href={index === 1 || index === 2 ? '#introduction' : index === 3 ? '#hobby' : '#hero'}>{section}</a>
+          <a href={section.href} data-section-link>{section.label}</a>
         </li>
       ))}
     </ol>
   </aside>
 
-  <section class="intro section-band" id="introduction">
+  <section class="intro section-band" id="introduction" data-section>
     <div>
       <h2>Introduction</h2>
       <p>
@@ -85,7 +116,7 @@ const sections = ['HERO', 'INTRODUCTION', 'QUICK FACTS', 'HOBBY', 'ADVENTURES'];
     </div>
   </section>
 
-  <section class="hobby section-band" id="hobby">
+  <section class="hobby section-band" id="hobby" data-section>
     <header>
       <h2>Hobby</h2>
       <p>These are the things that make my weekends feel awesome.</p>
@@ -95,8 +126,57 @@ const sections = ['HERO', 'INTRODUCTION', 'QUICK FACTS', 'HOBBY', 'ADVENTURES'];
         <article class="hobby__card">
           <h3>{item.title}</h3>
           <p>{item.detail}</p>
+          <button
+            class="hobby__toggle"
+            type="button"
+            data-hobby-toggle
+            aria-expanded="false"
+            aria-controls={`hobby-detail-${item.title.toLowerCase().replaceAll(/[^a-z]+/g, '-')}`}
+          >
+            More about this hobby
+          </button>
+          <p
+            class="hobby__detail"
+            id={`hobby-detail-${item.title.toLowerCase().replaceAll(/[^a-z]+/g, '-')}`}
+            data-hobby-detail
+          >
+            {item.extra}
+          </p>
         </article>
       ))}
+    </div>
+  </section>
+
+  <section class="adventures section-band" id="adventures" data-section>
+    <header>
+      <h2>Adventures</h2>
+      <p>Pick a mission to read the featured vlog log.</p>
+    </header>
+    <div class="adventures__content">
+      <div class="adventures__selectors" aria-label="Adventure missions">
+        {adventures.map((adventure, index) => (
+          <button
+            class="adventure__select"
+            type="button"
+            data-adventure-select
+            data-adventure-title={adventure.title}
+            data-adventure-place={adventure.place}
+            data-adventure-highlight={adventure.highlight}
+            data-adventure-lesson={adventure.lesson}
+            aria-pressed={index === 0 ? 'true' : 'false'}
+          >
+            <span>{adventure.title}</span>
+            <small>{adventure.place}</small>
+          </button>
+        ))}
+      </div>
+      <article class="adventures__featured" aria-live="polite">
+        <p class="adventures__eyebrow">FEATURED LOG</p>
+        <h3 data-adventure-title>{featuredAdventure.title}</h3>
+        <p class="adventures__place" data-adventure-place>{featuredAdventure.place}</p>
+        <p data-adventure-highlight>{featuredAdventure.highlight}</p>
+        <p class="adventures__lesson" data-adventure-lesson>{featuredAdventure.lesson}</p>
+      </article>
     </div>
   </section>
 </main>
@@ -541,7 +621,8 @@ const sections = ['HERO', 'INTRODUCTION', 'QUICK FACTS', 'HOBBY', 'ADVENTURES'];
   }
 
   .intro h2,
-  .hobby h2 {
+  .hobby h2,
+  .adventures h2 {
     margin: 0 0 18px;
     color: #f8fff2;
     font-size: clamp(40px, 6vw, 84px);
@@ -551,13 +632,17 @@ const sections = ['HERO', 'INTRODUCTION', 'QUICK FACTS', 'HOBBY', 'ADVENTURES'];
 
   .intro p,
   .hobby header p,
-  .hobby__card p {
+  .hobby__card p,
+  .adventures header p,
+  .adventures__featured p {
     color: rgba(235, 244, 247, 0.74);
     line-height: 1.75;
   }
 
   .intro__card,
-  .hobby__card {
+  .hobby__card,
+  .adventure__select,
+  .adventures__featured {
     background: rgba(17, 22, 17, 0.72);
     border: 1px solid rgba(219, 255, 197, 0.1);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 22px 60px rgba(0, 0, 0, 0.28);
@@ -569,7 +654,8 @@ const sections = ['HERO', 'INTRODUCTION', 'QUICK FACTS', 'HOBBY', 'ADVENTURES'];
   }
 
   .intro__card h3,
-  .hobby__card h3 {
+  .hobby__card h3,
+  .adventures__featured h3 {
     margin: 0 0 14px;
     color: var(--acid);
     font-family: var(--mono);
@@ -607,6 +693,134 @@ const sections = ['HERO', 'INTRODUCTION', 'QUICK FACTS', 'HOBBY', 'ADVENTURES'];
 
   .hobby__card p {
     margin: 0;
+  }
+
+  .hobby__toggle {
+    width: 100%;
+    min-height: 44px;
+    margin-top: 18px;
+    color: var(--acid);
+    background: rgba(185, 251, 75, 0.06);
+    border: 1px solid rgba(185, 251, 75, 0.34);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .hobby__toggle:hover,
+  .hobby__toggle[aria-expanded='true'] {
+    color: #0a0f0b;
+    background: var(--acid);
+  }
+
+  .hobby__toggle:focus-visible,
+  .adventure__select:focus-visible {
+    outline: 3px solid #f8fff1;
+    outline-offset: 3px;
+  }
+
+  .hobby__detail {
+    margin-top: 16px !important;
+  }
+
+  :global(.js) .hobby__detail[hidden] {
+    display: none;
+  }
+
+  .adventures header {
+    max-width: 760px;
+  }
+
+  .adventures__content {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.65fr) minmax(0, 1.35fr);
+    gap: 18px;
+    margin-top: 30px;
+  }
+
+  .adventures__selectors {
+    display: grid;
+    gap: 12px;
+    align-content: start;
+  }
+
+  .adventure__select {
+    width: 100%;
+    min-height: 64px;
+    padding: 14px 16px;
+    color: rgba(247, 255, 240, 0.84);
+    text-align: left;
+    font-family: var(--mono);
+    cursor: pointer;
+    transition: color 160ms ease, background 160ms ease, border-color 160ms ease, transform 160ms ease;
+  }
+
+  .adventure__select span,
+  .adventure__select small {
+    display: block;
+  }
+
+  .adventure__select span {
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .adventure__select small {
+    margin-top: 6px;
+    color: rgba(235, 244, 247, 0.56);
+    font-size: 10px;
+  }
+
+  .adventure__select:hover {
+    border-color: rgba(185, 251, 75, 0.58);
+    background: rgba(185, 251, 75, 0.12);
+    transform: translateX(3px);
+  }
+
+  .adventure__select:active {
+    transform: translateX(1px);
+  }
+
+  .adventure__select[aria-pressed='true'] {
+    color: #0a0f0b;
+    border-color: var(--acid);
+    background: var(--acid);
+  }
+
+  .adventure__select[aria-pressed='true'] small {
+    color: rgba(10, 15, 11, 0.72);
+  }
+
+  .adventures__featured {
+    min-height: 244px;
+    padding: 28px;
+    box-sizing: border-box;
+  }
+
+  .adventures__eyebrow {
+    margin: 0 0 14px !important;
+    color: var(--acid) !important;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .adventures__featured h3 {
+    margin-bottom: 8px;
+    font-size: clamp(28px, 4vw, 48px);
+  }
+
+  .adventures__place {
+    margin: 0 0 24px !important;
+    color: rgba(247, 255, 240, 0.9) !important;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  .adventures__lesson {
+    margin-top: 24px !important;
+    color: var(--acid) !important;
   }
 
   @keyframes brandIgnition {
@@ -695,12 +909,13 @@ const sections = ['HERO', 'INTRODUCTION', 'QUICK FACTS', 'HOBBY', 'ADVENTURES'];
     }
 
     .intro,
-    .hobby__grid {
+    .hobby__grid,
+    .adventures__content {
       grid-template-columns: 1fr;
     }
 
     .section-band {
-      padding: 10vh 6vw;
+      padding: 10vh 6vw calc(10vh + 118px);
     }
   }
 
