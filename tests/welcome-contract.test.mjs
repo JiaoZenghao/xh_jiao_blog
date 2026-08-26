@@ -28,3 +28,17 @@ test('adventures provide three selectors and a live featured log', () => {
   assert.match(source, /data-adventure-title/);
   assert.match(source, /data-adventure-lesson/);
 });
+
+test('adventure selectors disable motion for reduced-motion users', () => {
+  assert.match(
+    source,
+    /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.adventure__select \{[\s\S]*?transition: none;[\s\S]*?transform: none;/
+  );
+});
+
+test('rail links meet the minimum touch target size', () => {
+  assert.match(
+    source,
+    /\.rail a \{[\s\S]*?display: block;[\s\S]*?min-height: 44px;[\s\S]*?box-sizing: border-box;/
+  );
+});

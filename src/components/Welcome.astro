@@ -598,6 +598,11 @@ const featuredAdventure = adventures[0];
   }
 
   .rail a {
+    display: block;
+    min-height: 44px;
+    padding: 0 4px;
+    box-sizing: border-box;
+    line-height: 44px;
     color: rgba(240, 246, 242, 0.48);
     text-decoration: none;
   }
@@ -923,6 +928,11 @@ const featuredAdventure = adventures[0];
     .brand,
     .hero__copy {
       animation: none;
+    }
+
+    .adventure__select {
+      transition: none;
+      transform: none;
     }
   }
 </style>
