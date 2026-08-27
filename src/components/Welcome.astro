@@ -81,6 +81,10 @@ const featuredAdventure = adventures[0];
         <a class="cta ghost" href="#hobby">My hobbies</a>
       </div>
     </div>
+    <a class="scroll-cue" href="#introduction" aria-label="Scroll to introduction">
+      <span aria-hidden="true">↓</span>
+      Scroll to explore
+    </a>
   </section>
 
   <aside class="rail" aria-label="Page sections">
@@ -94,7 +98,7 @@ const featuredAdventure = adventures[0];
   </aside>
 
   <section class="intro section-band" id="introduction" data-section>
-    <div>
+    <div data-reveal>
       <h2>Introduction</h2>
       <p>
         I am an 11-year-old boy who loves to explore new places, try new food,
@@ -106,7 +110,7 @@ const featuredAdventure = adventures[0];
         tips I discover while growing up. Thanks for stopping by!
       </p>
     </div>
-    <div class="intro__card">
+    <div class="intro__card" data-reveal>
       <h3>Quick facts</h3>
       <ul>
         <li>Favorite color: ocean blue</li>
@@ -117,13 +121,13 @@ const featuredAdventure = adventures[0];
   </section>
 
   <section class="hobby section-band" id="hobby" data-section>
-    <header>
+    <header data-reveal>
       <h2>Hobby</h2>
       <p>These are the things that make my weekends feel awesome.</p>
     </header>
     <div class="hobby__grid">
       {hobbies.map((item) => (
-        <article class="hobby__card">
+        <article class="hobby__card" data-reveal>
           <h3>{item.title}</h3>
           <p>{item.detail}</p>
           <button
@@ -148,12 +152,12 @@ const featuredAdventure = adventures[0];
   </section>
 
   <section class="adventures section-band" id="adventures" data-section>
-    <header>
+    <header data-reveal>
       <h2>Adventures</h2>
       <p>Pick a mission to read the featured vlog log.</p>
     </header>
     <div class="adventures__content">
-      <div class="adventures__selectors" aria-label="Adventure missions">
+      <div class="adventures__selectors" aria-label="Adventure missions" data-reveal>
         {adventures.map((adventure, index) => (
           <button
             class="adventure__select"
@@ -170,7 +174,7 @@ const featuredAdventure = adventures[0];
           </button>
         ))}
       </div>
-      <article class="adventures__featured" aria-live="polite">
+      <article class="adventures__featured" aria-live="polite" data-reveal>
         <p class="adventures__eyebrow">FEATURED LOG</p>
         <h3 data-adventure-title>{featuredAdventure.title}</h3>
         <p class="adventures__place" data-adventure-place>{featuredAdventure.place}</p>
@@ -183,10 +187,184 @@ const featuredAdventure = adventures[0];
 
 <script>
   import * as THREE from 'three';
+  import {
+    chooseActiveSection,
+    getCardTilt,
+    getScrollProgress,
+  } from '../scripts/vlog-interactions.mjs';
 
-  const canvas = document.querySelector('[data-vlog-scene]');
+  const page = document.querySelector('.vlog-page');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const finePointer = window.matchMedia('(pointer: fine)');
+  const cleanups = [];
+  let scrollProgress = 0;
 
-  if (canvas instanceof HTMLCanvasElement) {
+  document.documentElement.classList.add('js');
+
+  const setupSectionNavigation = () => {
+    const sections = [...document.querySelectorAll('[data-section]')];
+    const links = [...document.querySelectorAll('[data-section-link]')];
+    if (!('IntersectionObserver' in window) || sections.length === 0) return;
+
+    const latest = new Map();
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        latest.set(entry.target.id, {
+          id: entry.target.id,
+          isIntersecting: entry.isIntersecting,
+          intersectionRatio: entry.intersectionRatio,
+        });
+      }
+
+      const activeId = chooseActiveSection([...latest.values()]);
+      if (!activeId) return;
+      for (const link of links) {
+        const active = link.getAttribute('href') === `#${activeId}`;
+        link.closest('li')?.classList.toggle('is-active', active);
+        if (active) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      }
+    }, { rootMargin: '-20% 0px -55%', threshold: [0.1, 0.25, 0.5, 0.75] });
+
+    sections.forEach((section) => observer.observe(section));
+    cleanups.push(() => observer.disconnect());
+  };
+
+  const setupReveals = () => {
+    const items = [...document.querySelectorAll('[data-reveal]')];
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+      items.forEach((item) => item.classList.add('is-visible'));
+      return;
+    }
+
+    items.forEach((item) => item.classList.add('is-enhanced'));
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: 0.16 });
+
+    items.forEach((item) => observer.observe(item));
+    cleanups.push(() => observer.disconnect());
+  };
+
+  const setupHobbies = () => {
+    document.querySelectorAll('[data-hobby-toggle]').forEach((toggle) => {
+      const panelId = toggle.getAttribute('aria-controls');
+      const panel = panelId ? document.getElementById(panelId) : null;
+      if (!(toggle instanceof HTMLButtonElement) || !panel) return;
+
+      panel.hidden = true;
+      const onToggle = () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        panel.hidden = expanded;
+        toggle.closest('.hobby__card')?.classList.toggle('is-open', !expanded);
+      };
+      toggle.addEventListener('click', onToggle);
+      cleanups.push(() => toggle.removeEventListener('click', onToggle));
+    });
+  };
+
+  const setupAdventures = () => {
+    const buttons = [...document.querySelectorAll('[data-adventure-select]')];
+    const fields = {
+      title: document.querySelector('.adventures__featured [data-adventure-title]'),
+      place: document.querySelector('.adventures__featured [data-adventure-place]'),
+      highlight: document.querySelector('.adventures__featured [data-adventure-highlight]'),
+      lesson: document.querySelector('.adventures__featured [data-adventure-lesson]'),
+    };
+    if (Object.values(fields).some((field) => !field)) return;
+
+    buttons.forEach((button) => {
+      const onSelect = () => {
+        fields.title.textContent = button.getAttribute('data-adventure-title') ?? '';
+        fields.place.textContent = button.getAttribute('data-adventure-place') ?? '';
+        fields.highlight.textContent = button.getAttribute('data-adventure-highlight') ?? '';
+        fields.lesson.textContent = button.getAttribute('data-adventure-lesson') ?? '';
+        buttons.forEach((candidate) => {
+          const selected = candidate === button;
+          candidate.setAttribute('aria-pressed', String(selected));
+          candidate.classList.toggle('is-selected', selected);
+        });
+      };
+      button.addEventListener('click', onSelect);
+      cleanups.push(() => button.removeEventListener('click', onSelect));
+    });
+  };
+
+  const setupPointerEffects = () => {
+    if (!finePointer.matches || reduceMotion.matches) return;
+
+    document.querySelectorAll('.hobby__card').forEach((card) => {
+      const onPointerMove = (event) => {
+        const tilt = getCardTilt(event.clientX, event.clientY, card.getBoundingClientRect());
+        card.style.setProperty('--tilt-x', `${tilt.rotateX}deg`);
+        card.style.setProperty('--tilt-y', `${tilt.rotateY}deg`);
+      };
+      const resetTilt = () => {
+        card.style.setProperty('--tilt-x', '0deg');
+        card.style.setProperty('--tilt-y', '0deg');
+      };
+      card.addEventListener('pointermove', onPointerMove);
+      card.addEventListener('pointerleave', resetTilt);
+      cleanups.push(() => {
+        card.removeEventListener('pointermove', onPointerMove);
+        card.removeEventListener('pointerleave', resetTilt);
+      });
+    });
+
+    document.querySelectorAll('.cta').forEach((cta) => {
+      const onPointerMove = (event) => {
+        const rect = cta.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+        const x = ((event.clientX - rect.left) / rect.width - 0.5) * 8;
+        const y = ((event.clientY - rect.top) / rect.height - 0.5) * 8;
+        const distance = Math.hypot(x, y);
+        const scale = distance > 4 ? 4 / distance : 1;
+        cta.style.setProperty('--cta-x', `${x * scale}px`);
+        cta.style.setProperty('--cta-y', `${y * scale}px`);
+      };
+      const resetCta = () => {
+        cta.style.setProperty('--cta-x', '0px');
+        cta.style.setProperty('--cta-y', '0px');
+      };
+      cta.addEventListener('pointermove', onPointerMove);
+      cta.addEventListener('pointerleave', resetCta);
+      cleanups.push(() => {
+        cta.removeEventListener('pointermove', onPointerMove);
+        cta.removeEventListener('pointerleave', resetCta);
+      });
+    });
+  };
+
+  const setupScrollState = () => {
+    const updateScrollProgress = () => {
+      scrollProgress = getScrollProgress(
+        window.scrollY,
+        document.documentElement.scrollHeight,
+        window.innerHeight
+      );
+      page?.style.setProperty('--section-progress', String(scrollProgress));
+    };
+    updateScrollProgress();
+    window.addEventListener('scroll', updateScrollProgress, { passive: true });
+    cleanups.push(() => window.removeEventListener('scroll', updateScrollProgress));
+  };
+
+  setupSectionNavigation();
+  setupReveals();
+  setupHobbies();
+  setupAdventures();
+  setupPointerEffects();
+  setupScrollState();
+
+  const setupWebGL = () => {
+    const canvas = document.querySelector('[data-vlog-scene]');
+    if (!(canvas instanceof HTMLCanvasElement)) return;
+
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x020506, 0.055);
 
@@ -317,12 +495,69 @@ const featuredAdventure = adventures[0];
     redGlow.position.set(-8, -0.5, -5);
     scene.add(redGlow);
 
+    let sceneProgress = scrollProgress;
+    let animationFrame = 0;
+    let running = false;
+    let animationStartedAt = 0;
+
+    const renderScene = (elapsed, animateMotion) => {
+      sceneProgress += (scrollProgress - sceneProgress) * (animateMotion ? 0.055 : 1);
+      eased.lerp(pointer, animateMotion ? 0.045 : 1);
+
+      if (animateMotion) {
+        const fieldPositions = field.geometry.attributes.position.array;
+        for (let i = 0; i < fieldPositions.length; i += 3) {
+          fieldPositions[i + 2] += 0.055;
+          if (fieldPositions[i + 2] > 8) fieldPositions[i + 2] = -86;
+        }
+        field.geometry.attributes.position.needsUpdate = true;
+      }
+
+      stars.rotation.y = animateMotion ? elapsed * 0.012 + eased.x * 0.025 : 0;
+      stars.material.opacity = animateMotion ? 0.66 + Math.sin(elapsed * 0.8) * 0.18 : 0.66;
+      whiteTrack.material.opacity = (animateMotion ? 0.72 + Math.sin(elapsed * 3.2) * 0.18 : 0.72) - sceneProgress * 0.12;
+      redTrack.material.opacity = (animateMotion ? 0.48 + Math.sin(elapsed * 4.1 + 1.4) * 0.18 : 0.48) - sceneProgress * 0.1;
+      hotTrack.material.opacity = (animateMotion ? 0.2 + Math.sin(elapsed * 2.3) * 0.1 : 0.2) - sceneProgress * 0.04;
+      whiteTrack.position.z = animateMotion ? Math.sin(elapsed * 1.2) * 0.32 : 0;
+      redTrack.position.z = animateMotion ? Math.cos(elapsed * 1.45) * 0.5 : 0;
+      horizon.material.opacity = animateMotion ? 0.07 + Math.sin(elapsed * 1.4) * 0.035 : 0.07;
+      redGlow.position.x = animateMotion ? -8 + Math.sin(elapsed * 1.8) * 5 : -8;
+      redGlow.position.z = animateMotion ? -4 - Math.abs(Math.sin(elapsed * 1.15)) * 18 : -4;
+
+      scene.fog.density = 0.055 + sceneProgress * 0.012;
+      camera.position.x = eased.x * 1.1;
+      camera.position.y = 8.4 + eased.y * 0.55 + (animateMotion ? Math.sin(elapsed * 0.42) * 0.12 : 0) - sceneProgress * 0.45;
+      camera.position.z = 17 + (animateMotion ? Math.sin(elapsed * 0.38) * 0.34 : 0) + sceneProgress * 0.75;
+      camera.lookAt(eased.x * 1.8, 0.1 + eased.y * 0.3, -30);
+      renderer.render(scene, camera);
+    };
+
+    const animate = (timestamp) => {
+      if (!running) return;
+      renderScene((timestamp - animationStartedAt) / 1000, true);
+      animationFrame = requestAnimationFrame(animate);
+    };
+
+    const startAnimation = () => {
+      if (running || reduceMotion.matches) return;
+      running = true;
+      animationStartedAt = performance.now();
+      animationFrame = requestAnimationFrame(animate);
+    };
+
+    const stopAnimation = () => {
+      running = false;
+      cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+    };
+
     const resize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height, false);
+      if (reduceMotion.matches) renderScene(0, false);
     };
 
     const onPointerMove = (event) => {
@@ -330,44 +565,55 @@ const featuredAdventure = adventures[0];
       pointer.y = -((event.clientY / window.innerHeight) * 2 - 1);
     };
 
-    window.addEventListener('resize', resize);
-    window.addEventListener('pointermove', onPointerMove);
-    resize();
-
-    const clock = new THREE.Clock();
-    const animate = () => {
-      const elapsed = clock.getElapsedTime();
-      eased.lerp(pointer, 0.045);
-
-      const fieldPositions = field.geometry.attributes.position.array;
-      for (let i = 0; i < fieldPositions.length; i += 3) {
-        fieldPositions[i + 2] += 0.055;
-        if (fieldPositions[i + 2] > 8) fieldPositions[i + 2] = -86;
+    const onMotionPreferenceChange = () => {
+      if (reduceMotion.matches) {
+        stopAnimation();
+        renderScene(0, false);
+      } else {
+        startAnimation();
       }
-      field.geometry.attributes.position.needsUpdate = true;
-
-      stars.rotation.y = elapsed * 0.012 + eased.x * 0.025;
-      stars.material.opacity = 0.66 + Math.sin(elapsed * 0.8) * 0.18;
-      whiteTrack.material.opacity = 0.72 + Math.sin(elapsed * 3.2) * 0.22;
-      redTrack.material.opacity = 0.48 + Math.sin(elapsed * 4.1 + 1.4) * 0.22;
-      hotTrack.material.opacity = 0.2 + Math.sin(elapsed * 2.3) * 0.12;
-      whiteTrack.position.z = Math.sin(elapsed * 1.2) * 0.32;
-      redTrack.position.z = Math.cos(elapsed * 1.45) * 0.5;
-      horizon.material.opacity = 0.07 + Math.sin(elapsed * 1.4) * 0.035;
-      redGlow.position.x = -8 + Math.sin(elapsed * 1.8) * 5;
-      redGlow.position.z = -4 - Math.abs(Math.sin(elapsed * 1.15)) * 18;
-
-      camera.position.x = eased.x * 1.1;
-      camera.position.y = 8.4 + eased.y * 0.55 + Math.sin(elapsed * 0.42) * 0.12;
-      camera.position.z = 17 + Math.sin(elapsed * 0.38) * 0.34;
-      camera.lookAt(eased.x * 1.8, 0.1 + eased.y * 0.3, -30);
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
     };
 
-    animate();
+    window.addEventListener('resize', resize);
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    reduceMotion.addEventListener('change', onMotionPreferenceChange);
+    const cleanupWebGL = () => {
+      stopAnimation();
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('pointermove', onPointerMove);
+      reduceMotion.removeEventListener('change', onMotionPreferenceChange);
+      scene.traverse((object) => {
+        if ('geometry' in object) object.geometry?.dispose?.();
+        if ('material' in object) {
+          const materials = Array.isArray(object.material) ? object.material : [object.material];
+          materials.forEach((material) => material?.dispose?.());
+        }
+      });
+      renderer.dispose();
+    };
+
+    try {
+      resize();
+      if (!reduceMotion.matches) startAnimation();
+      cleanups.push(cleanupWebGL);
+    } catch (error) {
+      cleanupWebGL();
+      throw error;
+    }
+  };
+
+  try {
+    setupWebGL();
+  } catch (error) {
+    page?.classList.add('webgl-unavailable');
+    console.warn('WebGL scene unavailable; continuing with DOM enhancements.', error);
   }
+
+  const cleanupPage = () => {
+    cleanups.splice(0).forEach((cleanup) => cleanup());
+    document.removeEventListener('astro:before-swap', cleanupPage);
+  };
+  document.addEventListener('astro:before-swap', cleanupPage, { once: true });
 </script>
 
 <style>
@@ -408,6 +654,10 @@ const featuredAdventure = adventures[0];
 
   .vlog-scene {
     z-index: 0;
+  }
+
+  .webgl-unavailable .vlog-scene {
+    display: none;
   }
 
   .scanlines {
@@ -542,6 +792,37 @@ const featuredAdventure = adventures[0];
     background: rgba(5, 7, 8, 0.58);
   }
 
+  .scroll-cue {
+    position: absolute;
+    right: 30px;
+    bottom: 28px;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 44px;
+    color: rgba(235, 244, 247, 0.72);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .scroll-cue span {
+    color: var(--acid);
+    font-size: 18px;
+    animation: cueDrift 1.5s ease-in-out infinite;
+  }
+
+  .topbar a:focus-visible,
+  .cta:focus-visible,
+  .rail a:focus-visible,
+  .hobby__toggle:focus-visible,
+  .adventure__select:focus-visible,
+  .scroll-cue:focus-visible {
+    outline: 3px solid #f8fff1;
+    outline-offset: 3px;
+  }
+
   .rail {
     position: fixed;
     z-index: 4;
@@ -616,6 +897,17 @@ const featuredAdventure = adventures[0];
     z-index: 2;
     padding: 12vh 8vw;
     background: linear-gradient(180deg, rgba(3, 5, 4, 0.72), rgba(3, 5, 4, 0.94));
+  }
+
+  [data-reveal].is-enhanced {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 560ms ease, transform 560ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [data-reveal].is-enhanced.is-visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .intro {
@@ -693,6 +985,8 @@ const featuredAdventure = adventures[0];
   }
 
   .hobby__card {
+    --tilt-x: 0deg;
+    --tilt-y: 0deg;
     padding: 22px;
   }
 
@@ -717,12 +1011,6 @@ const featuredAdventure = adventures[0];
   .hobby__toggle[aria-expanded='true'] {
     color: #0a0f0b;
     background: var(--acid);
-  }
-
-  .hobby__toggle:focus-visible,
-  .adventure__select:focus-visible {
-    outline: 3px solid #f8fff1;
-    outline-offset: 3px;
   }
 
   .hobby__detail {
@@ -793,6 +1081,10 @@ const featuredAdventure = adventures[0];
     background: var(--acid);
   }
 
+  .adventure__select.is-selected {
+    border-color: var(--acid);
+  }
+
   .adventure__select[aria-pressed='true'] small {
     color: rgba(10, 15, 11, 0.72);
   }
@@ -854,6 +1146,42 @@ const featuredAdventure = adventures[0];
     }
   }
 
+  @keyframes cueDrift {
+    0%, 100% {
+      transform: translateY(-2px);
+    }
+    50% {
+      transform: translateY(3px);
+    }
+  }
+
+  @media (pointer: fine) {
+    .hobby__card {
+      transform: perspective(800px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+      transform-style: preserve-3d;
+      transition: transform 160ms ease;
+    }
+
+    .hobby__card.is-enhanced {
+      transform: translateY(24px) perspective(800px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+      transition: opacity 560ms ease, transform 160ms ease;
+    }
+
+    .hobby__card.is-enhanced.is-visible {
+      transform: translateY(0) perspective(800px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+    }
+
+    .cta {
+      --cta-x: 0px;
+      --cta-y: 0px;
+      transform: translate3d(var(--cta-x), var(--cta-y), 0);
+    }
+
+    .cta:hover {
+      transform: translate3d(var(--cta-x), var(--cta-y), 0);
+    }
+  }
+
   @media (max-width: 840px) {
     .topbar {
       inset: 16px 14px auto;
@@ -895,6 +1223,11 @@ const featuredAdventure = adventures[0];
       font-size: 14px;
     }
 
+    .scroll-cue {
+      right: 18px;
+      bottom: 102px;
+    }
+
     .rail {
       left: 14px;
       right: 14px;
@@ -925,16 +1258,32 @@ const featuredAdventure = adventures[0];
   }
 
   @media (prefers-reduced-motion: reduce) {
+    :global(html) {
+      scroll-behavior: auto;
+    }
+
     .brand,
-    .hero__copy {
+    .hero__copy,
+    .scroll-cue span {
       animation: none;
     }
 
+    [data-reveal],
+    [data-reveal].is-enhanced,
+    [data-reveal].is-enhanced.is-visible,
+    .hobby__card,
+    .cta,
+    .topbar a,
     .adventure__select {
       transition: none;
       transform: none;
     }
 
+    [data-reveal].is-enhanced {
+      opacity: 1;
+    }
+
+    .cta:hover,
     .adventure__select:hover,
     .adventure__select:active {
       transform: none;

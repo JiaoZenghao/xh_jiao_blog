@@ -46,3 +46,12 @@ test('rail links meet the minimum touch target size', () => {
     /\.rail a \{[\s\S]*?display: block;[\s\S]*?min-height: 44px;[\s\S]*?box-sizing: border-box;/
   );
 });
+
+test('enhancement script wires navigation, disclosures, adventures, and reduced motion', () => {
+  assert.match(source, /chooseActiveSection/);
+  assert.match(source, /getScrollProgress/);
+  assert.match(source, /IntersectionObserver/);
+  assert.match(source, /data-adventure-select/);
+  assert.match(source, /aria-expanded/);
+  assert.match(source, /prefers-reduced-motion:\s*reduce/);
+});
