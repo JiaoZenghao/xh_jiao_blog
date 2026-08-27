@@ -13,6 +13,14 @@ export const chooseActiveSection = (entries) => {
   ).id;
 };
 
+export const getPageEndSection = (
+  scrollY,
+  viewportHeight,
+  scrollHeight,
+  finalSectionId,
+  tolerance = 2
+) => scrollY + viewportHeight >= scrollHeight - tolerance ? finalSectionId ?? null : null;
+
 export const getCardTilt = (pointerX, pointerY, rect, maxDegrees = 5) => {
   if (rect.width <= 0 || rect.height <= 0) return { rotateX: 0, rotateY: 0 };
   const normalizedX = ((pointerX - rect.left) / rect.width) * 2 - 1;

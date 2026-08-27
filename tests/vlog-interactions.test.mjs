@@ -5,6 +5,7 @@ import * as interactions from '../src/scripts/vlog-interactions.mjs';
 const {
   chooseActiveSection,
   getCardTilt,
+  getPageEndSection,
   getScrollProgress,
 } = interactions;
 
@@ -23,6 +24,12 @@ test('chooseActiveSection selects the intersecting section with the greatest rat
   ]);
   assert.equal(active, 'introduction');
   assert.equal(chooseActiveSection([]), null);
+});
+
+test('getPageEndSection selects only the final section at the document end', () => {
+  assert.equal(typeof getPageEndSection, 'function');
+  assert.equal(getPageEndSection(1781, 1000, 2781, 'adventures'), 'adventures');
+  assert.equal(getPageEndSection(1778, 1000, 2781, 'adventures'), null);
 });
 
 test('getCardTilt centers at zero and clamps edge rotation', () => {

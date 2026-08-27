@@ -202,6 +202,7 @@ const featuredAdventure = adventures[0];
     getAdventureSelection,
     getCardTilt,
     getDisclosureState,
+    getPageEndSection,
     getScrollProgress,
   } from '../scripts/vlog-interactions.mjs';
 
@@ -218,6 +219,24 @@ const featuredAdventure = adventures[0];
     const links = [...document.querySelectorAll('[data-section-link]')];
     if (!('IntersectionObserver' in window) || sections.length === 0) return;
 
+    const updateActiveLink = (activeId) => {
+      if (!activeId) return;
+      for (const link of links) {
+        const active = link.getAttribute('href') === `#${activeId}`;
+        link.closest('li')?.classList.toggle('is-active', active);
+        if (active) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      }
+    };
+    const activateLastSectionAtPageEnd = () => {
+      updateActiveLink(getPageEndSection(
+        window.scrollY,
+        window.innerHeight,
+        document.documentElement.scrollHeight,
+        sections.at(-1)?.id
+      ));
+    };
+
     const latest = new Map();
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
@@ -228,18 +247,16 @@ const featuredAdventure = adventures[0];
         });
       }
 
-      const activeId = chooseActiveSection([...latest.values()]);
-      if (!activeId) return;
-      for (const link of links) {
-        const active = link.getAttribute('href') === `#${activeId}`;
-        link.closest('li')?.classList.toggle('is-active', active);
-        if (active) link.setAttribute('aria-current', 'location');
-        else link.removeAttribute('aria-current');
-      }
+      updateActiveLink(chooseActiveSection([...latest.values()]));
+      activateLastSectionAtPageEnd();
     }, { rootMargin: '-20% 0px -55%', threshold: [0.1, 0.25, 0.5, 0.75] });
 
     sections.forEach((section) => observer.observe(section));
-    cleanups.push(() => observer.disconnect());
+    window.addEventListener('scroll', activateLastSectionAtPageEnd, { passive: true });
+    cleanups.push(() => {
+      observer.disconnect();
+      window.removeEventListener('scroll', activateLastSectionAtPageEnd);
+    });
   };
 
   const setupReveals = () => {
