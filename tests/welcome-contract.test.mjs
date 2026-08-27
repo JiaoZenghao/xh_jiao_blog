@@ -14,8 +14,90 @@ test('navigation maps to four unique real sections', () => {
 
 test('hobbies render as accessible disclosures', () => {
   assert.match(source, /data-hobby-toggle/);
-  assert.match(source, /aria-expanded=["']false["']/);
+  assert.match(
+    source,
+    /<button[\s\S]*?data-hobby-toggle[\s\S]*?aria-expanded=["']true["'][\s\S]*?<p[\s\S]*?data-hobby-detail/
+  );
+  assert.match(
+    source,
+    /const setupHobbies = \(\) => \{[\s\S]*?toggle\.setAttribute\('aria-expanded', 'false'\);[\s\S]*?panel\.hidden = true;[\s\S]*?classList\.remove\('is-open'\)/
+  );
   assert.match(source, /data-hobby-detail/);
+});
+
+test('mobile rail keeps a compact non-color current-section indicator', () => {
+  assert.match(
+    source,
+    /@media \(max-width: 840px\) \{[\s\S]*?\.rail ol \{[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\)/
+  );
+  assert.match(
+    source,
+    /@media \(max-width: 840px\) \{[\s\S]*?\.rail \.is-active a \{[\s\S]*?border-bottom:/
+  );
+});
+
+test('hero exposes a semantic animated explorer status with a reduced-motion fallback', () => {
+  assert.match(
+    source,
+    /<aside class="hero__status" aria-label="Explorer status" data-explorer-status>[\s\S]*?<dl>[\s\S]*?<dt>[\s\S]*?<dd>/
+  );
+  const baseSignalRule = source.match(/\n  \.hero__status-signal::before \{([\s\S]*?)\n  \}/);
+  assert.ok(baseSignalRule, 'expected a static base explorer-signal rule');
+  assert.doesNotMatch(baseSignalRule[1], /animation:/);
+  assert.match(
+    source,
+    /:global\(\.js\) \.hero__status-signal::before \{\s*animation: explorerSignal 1\.8s ease-in-out infinite;\s*\}/
+  );
+  assert.match(source, /@keyframes explorerSignal[\s\S]*?transform:[\s\S]*?opacity:/);
+  assert.match(
+    source,
+    /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?:global\(\.js\) \.hero__status-signal::before \{[\s\S]*?animation: none;/
+  );
+});
+
+test('reveal items use deterministic transform-and-opacity stagger timing', () => {
+  assert.match(source, /class="intro__card" data-reveal style="--reveal-delay: 70ms"/);
+  assert.match(source, /style=\{`--reveal-delay: \$\{\(index \+ 1\) \* 70\}ms`\}/);
+  assert.match(source, /class="adventures__featured"[\s\S]*?style="--reveal-delay: 140ms"/);
+  assert.match(
+    source,
+    /\[data-reveal\]\.is-enhanced \{[\s\S]*?transition: opacity 560ms ease, transform 560ms[\s\S]*?transition-delay: var\(--reveal-delay, 0ms\);/
+  );
+  assert.match(
+    source,
+    /@media \(pointer: fine\) \{[\s\S]*?\.hobby__card\.is-enhanced \{[\s\S]*?translate: 0 24px;[\s\S]*?transition:[\s\S]*?opacity 560ms ease,[\s\S]*?translate 560ms[\s\S]*?transform 160ms ease;[\s\S]*?transition-delay:[\s\S]*?var\(--reveal-delay, 0ms\),[\s\S]*?var\(--reveal-delay, 0ms\),[\s\S]*?0ms;/
+  );
+  assert.match(source, /\.hobby__card\.is-enhanced\.is-visible \{[\s\S]*?translate: 0;/);
+  assert.match(
+    source,
+    /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\[data-reveal\],[\s\S]*?transition: none;\s*transform: none;\s*translate: none;/
+  );
+});
+
+test('hero CTAs provide explicit pressed feedback without reduced-motion movement', () => {
+  assert.match(
+    source,
+    /\.cta:active \{[\s\S]*?box-shadow:[\s\S]*?transform: translateY\(1px\) scale\(0\.98\);/
+  );
+  assert.match(
+    source,
+    /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.cta:active[\s\S]*?transform: none;/
+  );
+  const ghostRule = source.indexOf('.cta.ghost {');
+  const ghostActiveRule = source.indexOf('.cta.ghost:active {');
+  assert.ok(ghostRule >= 0 && ghostActiveRule > ghostRule);
+  assert.match(source.slice(ghostActiveRule), /^\.cta\.ghost:active \{[\s\S]*?background: #e8ffc0;/);
+});
+
+test('WebGL cleanup is available while resources are being allocated', () => {
+  const cleanupBoundary = source.indexOf('const cleanupWebGL = () => {');
+  const allocationBoundary = source.indexOf('renderer = new THREE.WebGLRenderer({');
+  const guardedBoundary = source.lastIndexOf('try {', allocationBoundary);
+
+  assert.ok(cleanupBoundary >= 0 && cleanupBoundary < allocationBoundary);
+  assert.ok(guardedBoundary >= 0 && guardedBoundary < allocationBoundary);
+  assert.match(source, /trackResource\(new THREE\.BufferGeometry\(\)\)/);
+  assert.match(source, /catch \(error\) \{\s*cleanupWebGL\(\);\s*throw error;/);
 });
 
 test('adventures provide three selectors and a live featured log', () => {
