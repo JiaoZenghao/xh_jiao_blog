@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {
+import * as interactions from '../src/scripts/vlog-interactions.mjs';
+
+const {
   chooseActiveSection,
   getCardTilt,
   getScrollProgress,
-} from '../src/scripts/vlog-interactions.mjs';
+} = interactions;
 
 test('getScrollProgress clamps document progress to zero through one', () => {
   assert.equal(getScrollProgress(-20, 2000, 1000), 0);
@@ -28,4 +30,30 @@ test('getCardTilt centers at zero and clamps edge rotation', () => {
   assert.deepEqual(getCardTilt(200, 100, rect), { rotateX: 0, rotateY: 0 });
   assert.deepEqual(getCardTilt(300, 50, rect, 6), { rotateX: 6, rotateY: 6 });
   assert.deepEqual(getCardTilt(0, 300, rect, 6), { rotateX: -6, rotateY: -6 });
+});
+
+test('getDisclosureState keeps expanded and hidden state synchronized', () => {
+  assert.equal(typeof interactions.getDisclosureState, 'function');
+  assert.deepEqual(interactions.getDisclosureState(false), {
+    expanded: true,
+    hidden: false,
+  });
+  assert.deepEqual(interactions.getDisclosureState(true), {
+    expanded: false,
+    hidden: true,
+  });
+});
+
+test('getAdventureSelection returns featured content and one pressed selector', () => {
+  assert.equal(typeof interactions.getAdventureSelection, 'function');
+  const adventures = [
+    { title: 'A', place: 'One', highlight: 'Glow', lesson: 'Look closely' },
+    { title: 'B', place: 'Two', highlight: 'Clouds', lesson: 'Take time' },
+    { title: 'C', place: 'Three', highlight: 'Sunrise', lesson: 'Start early' },
+  ];
+
+  assert.deepEqual(interactions.getAdventureSelection(adventures, 1), {
+    featured: adventures[1],
+    pressed: [false, true, false],
+  });
 });

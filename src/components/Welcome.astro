@@ -181,6 +181,16 @@ const featuredAdventure = adventures[0];
         <p data-adventure-highlight>{featuredAdventure.highlight}</p>
         <p class="adventures__lesson" data-adventure-lesson>{featuredAdventure.lesson}</p>
       </article>
+      <div class="adventures__fallback" data-adventure-fallback>
+        {adventures.map((adventure) => (
+          <article class="adventure__fallback-card">
+            <h3>{adventure.title}</h3>
+            <p class="adventures__place">{adventure.place}</p>
+            <p>{adventure.highlight}</p>
+            <p class="adventures__lesson">{adventure.lesson}</p>
+          </article>
+        ))}
+      </div>
     </div>
   </section>
 </main>
@@ -189,7 +199,9 @@ const featuredAdventure = adventures[0];
   import * as THREE from 'three';
   import {
     chooseActiveSection,
+    getAdventureSelection,
     getCardTilt,
+    getDisclosureState,
     getScrollProgress,
   } from '../scripts/vlog-interactions.mjs';
 
@@ -259,9 +271,10 @@ const featuredAdventure = adventures[0];
       panel.hidden = true;
       const onToggle = () => {
         const expanded = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', String(!expanded));
-        panel.hidden = expanded;
-        toggle.closest('.hobby__card')?.classList.toggle('is-open', !expanded);
+        const state = getDisclosureState(expanded);
+        toggle.setAttribute('aria-expanded', String(state.expanded));
+        panel.hidden = state.hidden;
+        toggle.closest('.hobby__card')?.classList.toggle('is-open', state.expanded);
       };
       toggle.addEventListener('click', onToggle);
       cleanups.push(() => toggle.removeEventListener('click', onToggle));
@@ -270,6 +283,12 @@ const featuredAdventure = adventures[0];
 
   const setupAdventures = () => {
     const buttons = [...document.querySelectorAll('[data-adventure-select]')];
+    const adventures = buttons.map((button) => ({
+      title: button.getAttribute('data-adventure-title') ?? '',
+      place: button.getAttribute('data-adventure-place') ?? '',
+      highlight: button.getAttribute('data-adventure-highlight') ?? '',
+      lesson: button.getAttribute('data-adventure-lesson') ?? '',
+    }));
     const fields = {
       title: document.querySelector('.adventures__featured [data-adventure-title]'),
       place: document.querySelector('.adventures__featured [data-adventure-place]'),
@@ -278,14 +297,16 @@ const featuredAdventure = adventures[0];
     };
     if (Object.values(fields).some((field) => !field)) return;
 
-    buttons.forEach((button) => {
+    buttons.forEach((button, selectedIndex) => {
       const onSelect = () => {
-        fields.title.textContent = button.getAttribute('data-adventure-title') ?? '';
-        fields.place.textContent = button.getAttribute('data-adventure-place') ?? '';
-        fields.highlight.textContent = button.getAttribute('data-adventure-highlight') ?? '';
-        fields.lesson.textContent = button.getAttribute('data-adventure-lesson') ?? '';
-        buttons.forEach((candidate) => {
-          const selected = candidate === button;
+        const selection = getAdventureSelection(adventures, selectedIndex);
+        if (!selection.featured) return;
+        fields.title.textContent = selection.featured.title;
+        fields.place.textContent = selection.featured.place;
+        fields.highlight.textContent = selection.featured.highlight;
+        fields.lesson.textContent = selection.featured.lesson;
+        buttons.forEach((candidate, index) => {
+          const selected = selection.pressed[index];
           candidate.setAttribute('aria-pressed', String(selected));
           candidate.classList.toggle('is-selected', selected);
         });
@@ -697,6 +718,12 @@ const featuredAdventure = adventures[0];
 
   .topbar a,
   .cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    box-sizing: border-box;
     color: rgba(235, 244, 247, 0.86);
     text-decoration: none;
     background: rgba(32, 40, 45, 0.82);
@@ -939,7 +966,8 @@ const featuredAdventure = adventures[0];
   .intro__card,
   .hobby__card,
   .adventure__select,
-  .adventures__featured {
+  .adventures__featured,
+  .adventure__fallback-card {
     background: rgba(17, 22, 17, 0.72);
     border: 1px solid rgba(219, 255, 197, 0.1);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 22px 60px rgba(0, 0, 0, 0.28);
@@ -952,7 +980,8 @@ const featuredAdventure = adventures[0];
 
   .intro__card h3,
   .hobby__card h3,
-  .adventures__featured h3 {
+  .adventures__featured h3,
+  .adventure__fallback-card h3 {
     margin: 0 0 14px;
     color: var(--acid);
     font-family: var(--mono);
@@ -1032,10 +1061,39 @@ const featuredAdventure = adventures[0];
     margin-top: 30px;
   }
 
-  .adventures__selectors {
+  .adventures__selectors,
+  .adventures__featured {
+    display: none;
+  }
+
+  :global(.js) .adventures__selectors {
     display: grid;
     gap: 12px;
     align-content: start;
+  }
+
+  :global(.js) .adventures__featured {
+    display: block;
+  }
+
+  .adventures__fallback {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  :global(.js) .adventures__fallback {
+    display: none;
+  }
+
+  .adventure__fallback-card {
+    padding: 22px;
+  }
+
+  .adventure__fallback-card p {
+    color: rgba(235, 244, 247, 0.74);
+    line-height: 1.75;
   }
 
   .adventure__select {
@@ -1197,6 +1255,8 @@ const featuredAdventure = adventures[0];
     }
 
     .topbar a {
+      min-width: 44px;
+      min-height: 44px;
       padding: 6px 7px;
       font-size: 10px;
     }
@@ -1248,7 +1308,8 @@ const featuredAdventure = adventures[0];
 
     .intro,
     .hobby__grid,
-    .adventures__content {
+    .adventures__content,
+    .adventures__fallback {
       grid-template-columns: 1fr;
     }
 
@@ -1283,6 +1344,7 @@ const featuredAdventure = adventures[0];
       opacity: 1;
     }
 
+    .topbar a:hover,
     .cta:hover,
     .adventure__select:hover,
     .adventure__select:active {

@@ -22,3 +22,13 @@ export const getCardTilt = (pointerX, pointerY, rect, maxDegrees = 5) => {
     rotateY: clamp(normalizedX * maxDegrees, -maxDegrees, maxDegrees) || 0,
   };
 };
+
+export const getDisclosureState = (expanded) => ({
+  expanded: !expanded,
+  hidden: expanded,
+});
+
+export const getAdventureSelection = (adventures, selectedIndex) => ({
+  featured: adventures[selectedIndex] ?? null,
+  pressed: adventures.map((_, index) => index === selectedIndex),
+});
