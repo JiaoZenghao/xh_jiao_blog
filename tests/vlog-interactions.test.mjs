@@ -29,6 +29,7 @@ test('chooseActiveSection selects the intersecting section with the greatest rat
 test('getPageEndSection selects only the final section at the document end', () => {
   assert.equal(typeof getPageEndSection, 'function');
   assert.equal(getPageEndSection(1781, 1000, 2781, 'adventures'), 'adventures');
+  assert.equal(getPageEndSection(1779, 1000, 2781, 'adventures'), 'adventures');
   assert.equal(getPageEndSection(1778, 1000, 2781, 'adventures'), null);
 });
 
