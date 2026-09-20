@@ -1,69 +1,80 @@
 ---
+import MotionScene from './MotionScene.astro';
+
+const navItems = [
+  { label: 'Meet me', href: '#introduction' },
+  { label: 'Hobbies', href: '#hobby' },
+  { label: 'Home', href: '#hero' },
+];
+
+const facts = [
+  { label: 'Favorite color', value: 'Ocean blue', tone: 'cyan' },
+  { label: 'Dream trip', value: 'Aquariums + mountain trains', tone: 'gold' },
+  { label: 'Best snack', value: 'Fruit yogurt + crackers', tone: 'green' },
+];
+
 const hobbies = [
   {
     title: 'Sports + Outdoors',
     detail: 'Basketball, swimming, beach walks, and weekend bike rides.',
+    metric: 'Move',
+    status: 'active',
   },
   {
     title: 'Games + Building',
     detail: 'LEGO builds, Minecraft creative mode, and puzzle challenges.',
+    metric: 'Build',
+    status: 'creative',
   },
   {
     title: 'Curious Stuff',
     detail: 'Space facts, kid science videos, and fun experiments at home.',
+    metric: 'Learn',
+    status: 'scanning',
   },
 ];
-
-const navItems = [
-  { label: '[M] MEET ME', href: '#introduction' },
-  { label: '[H] HOBBIES', href: '#hobby' },
-  { label: '[T] TOP', href: '#hero' },
-];
-
-const sections = ['HERO', 'INTRODUCTION', 'QUICK FACTS', 'HOBBY', 'ADVENTURES'];
 ---
 
 <main class="vlog-page">
-  <canvas class="vlog-scene" data-vlog-scene aria-hidden="true"></canvas>
-  <div class="scanlines" aria-hidden="true"></div>
-
-  <header class="topbar" aria-label="Primary">
-    <p>SCROLL OR PRESS DOWN AND UP</p>
-    <nav>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="logo" href="#hero" aria-label="TT Vlog home">
+      <span class="logo__mark">TT</span>
+      <span class="logo__text">Vlog OS</span>
+    </a>
+    <nav aria-label="Primary">
       {navItems.map((item) => (
         <a href={item.href}>{item.label}</a>
       ))}
     </nav>
+    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to light theme" aria-pressed="false">
+      <span class="theme-toggle__track" aria-hidden="true">
+        <span class="theme-toggle__thumb"></span>
+      </span>
+      <span class="theme-toggle__text" data-theme-label>Dark</span>
+    </button>
   </header>
 
   <section class="hero" id="hero">
-    <p class="brand">TT VLOG</p>
     <div class="hero__copy">
-      <p class="hero__tag">Personal vlog · Age 11</p>
-      <h1>Hi! I share my days, ideas, and mini adventures.</h1>
+      <p class="eyebrow">Personal vlog · Mission log · Age 11</p>
+      <h1>TT Vlog<span>Small adventures.<br />Big discoveries.</span></h1>
       <p class="hero__lead">
-        This is my little corner to write about trips, school wins, and the fun
+        A small digital base for travel notes, school wins, hobbies, and the cool
         things I learn every week.
       </p>
-      <div class="hero__cta">
-        <a class="cta" href="#introduction">Meet me</a>
-        <a class="cta ghost" href="#hobby">My hobbies</a>
+      <div class="hero__cta" aria-label="Page shortcuts">
+        <a class="cta cta--primary" href="#introduction">Open profile</a>
+        <a class="cta" href="#hobby">Explore hobbies <span aria-hidden="true">↗</span></a>
       </div>
     </div>
+
+    <div class="hero-motion"><MotionScene /></div>
   </section>
 
-  <aside class="rail" aria-label="Page sections">
-    <ol>
-      {sections.map((section, index) => (
-        <li class={index === 0 ? 'is-active' : ''}>
-          <a href={index === 1 || index === 2 ? '#introduction' : index === 3 ? '#hobby' : '#hero'}>{section}</a>
-        </li>
-      ))}
-    </ol>
-  </aside>
-
   <section class="intro section-band" id="introduction">
-    <div>
+    <div class="section-copy">
+      <p class="eyebrow">Profile scan</p>
       <h2>Introduction</h2>
       <p>
         I am an 11-year-old boy who loves to explore new places, try new food,
@@ -75,639 +86,963 @@ const sections = ['HERO', 'INTRODUCTION', 'QUICK FACTS', 'HOBBY', 'ADVENTURES'];
         tips I discover while growing up. Thanks for stopping by!
       </p>
     </div>
-    <div class="intro__card">
-      <h3>Quick facts</h3>
-      <ul>
-        <li>Favorite color: ocean blue</li>
-        <li>Dream trip: giant aquariums + mountain trains</li>
-        <li>Best snack: fruit yogurt + crackers</li>
-      </ul>
-    </div>
-  </section>
 
-  <section class="hobby section-band" id="hobby">
-    <header>
-      <h2>Hobby</h2>
-      <p>These are the things that make my weekends feel awesome.</p>
-    </header>
-    <div class="hobby__grid">
-      {hobbies.map((item) => (
-        <article class="hobby__card">
-          <h3>{item.title}</h3>
-          <p>{item.detail}</p>
+    <div class="profile-panel">
+      <div class="panel-topline">
+        <span>PROFILE-ID TT-011</span>
+        <span>SYNCED</span>
+      </div>
+      <MotionScene variant="signal" label="TT / PROFILE" />
+    </div>
+
+    <div class="facts-grid" aria-label="Quick facts">
+      {facts.map((fact) => (
+        <article class={`fact-card fact-card--${fact.tone}`}>
+          <span>{fact.label}</span>
+          <strong>{fact.value}</strong>
         </article>
       ))}
     </div>
   </section>
+
+  <section class="hobby section-band" id="hobby">
+    <header class="section-copy">
+      <p class="eyebrow">Weekend telemetry</p>
+      <h2>Off the clock.<br />Into the curious.</h2>
+      <p>These are the things that make my weekends feel awesome.</p>
+    </header>
+
+    <div class="hobby__grid">
+      {hobbies.map((item, index) => (
+        <article class="hobby__card">
+          <div class="hobby__dial" aria-hidden="true">
+            <span>{String(index + 1).padStart(2, '0')}</span>
+          </div>
+          <div>
+            <p class="hobby__metric">{item.metric}</p>
+            <h3>{item.title}</h3>
+          </div>
+          <p>{item.detail}</p>
+          <footer>
+            <span>Status</span>
+            <strong>{item.status}</strong>
+          </footer>
+        </article>
+      ))}
+    </div>
+  </section>
+  <footer class="site-footer"><a href="#hero">TT Vlog <span aria-hidden="true">↑</span></a><span>Stay curious. Keep exploring.</span></footer>
 </main>
 
 <script>
-  import * as THREE from 'three';
+  import { animate } from 'animejs';
+  const themeToggle = document.querySelector('[data-theme-toggle]');
+  const themeLabel = document.querySelector('[data-theme-label]');
 
-  const canvas = document.querySelector('[data-vlog-scene]');
+  const syncThemeToggle = () => {
+    const isLight = document.documentElement.dataset.theme === 'light';
+    themeToggle?.setAttribute('aria-pressed', String(isLight));
+    themeToggle?.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to light theme');
+    if (themeLabel) {
+      themeLabel.textContent = isLight ? 'Light' : 'Dark';
+    }
+  };
 
-  if (canvas instanceof HTMLCanvasElement) {
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x020506, 0.055);
+  themeToggle?.addEventListener('click', () => {
+    const nextTheme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = nextTheme;
+    localStorage.setItem('theme', nextTheme);
+    syncThemeToggle();
+  });
 
-    const camera = new THREE.PerspectiveCamera(62, 1, 0.1, 180);
-    camera.position.set(0, 8.5, 17);
-    camera.lookAt(0, 0.3, -28);
+  syncThemeToggle();
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: false,
-      powerPreference: 'high-performance',
+  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  // Seek paused animations from scroll position so upward scrolling reverses them.
+  const scrollItems = [...document.querySelectorAll<HTMLElement>('.section-copy, .profile-panel, .fact-card, .hobby__card, .site-footer')].map((element) => {
+    const isCard = element.matches('.fact-card, .hobby__card');
+    const index = isCard ? [...element.parentElement!.children].indexOf(element) : 0;
+    element.classList.add('scroll-linked');
+    return {
+      element,
+      top: 0,
+      delay: index * 0.055,
+      animation: animate(element, {
+        y: [isCard ? 90 : 48, 0],
+        opacity: [0.35, 1],
+        scale: [isCard ? 0.94 : 1, 1],
+        rotate: [isCard ? (index - 1) * 2 : 0, 0],
+        duration: 1000,
+        ease: 'outCubic',
+        autoplay: false,
+      }),
+    };
+  });
+  const sections = [...document.querySelectorAll<HTMLElement>('main > section')].map((element) => ({ element, top: 0, height: 0 }));
+  const heroMotion = document.querySelector<HTMLElement>('.hero-motion')!;
+  const heroParallax = animate(heroMotion, { y: [0, 100], rotate: [0, 18], scale: [1, 0.86], duration: 1000, ease: 'linear', autoplay: false });
+  const dials = [...document.querySelectorAll<HTMLElement>('.hobby__dial')].map((element) => ({
+    element,
+    animation: animate(element, { rotate: [-140, 0], duration: 1000, ease: 'outCubic', autoplay: false }),
+  }));
+  const clampProgress = (value: number) => Math.min(1, Math.max(0, value));
+  const documentTop = (element: HTMLElement) => {
+    let top = 0;
+    let current: HTMLElement | null = element;
+    while (current) { top += current.offsetTop; current = current.offsetParent as HTMLElement | null; }
+    return top;
+  };
+  const measure = () => {
+    scrollItems.forEach((item) => { item.top = documentTop(item.element); });
+    sections.forEach((item) => { item.top = documentTop(item.element); item.height = item.element.offsetHeight; });
+  };
+
+  const progress = document.querySelector<HTMLElement>('.reading-progress');
+  let scrollFrame = 0;
+  const updateProgress = () => {
+    const distance = document.documentElement.scrollHeight - window.innerHeight;
+    progress?.style.setProperty('--progress', String(distance > 0 ? window.scrollY / distance : 0));
+    const viewport = window.innerHeight;
+    scrollItems.forEach((item) => {
+      const start = item.top - viewport * (0.98 - item.delay);
+      const end = Math.min(start + viewport * 0.48, distance);
+      const position = (window.scrollY - start) / Math.max(1, end - start);
+      item.animation.seek((motion.matches ? 1 : clampProgress(position)) * 1000);
     });
-    renderer.setClearColor(0x020304, 1);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.25;
+    sections.forEach((item) => {
+      const position = clampProgress((window.scrollY + viewport - item.top) / (viewport + item.height));
+      item.element.style.setProperty('--section-progress', String(motion.matches ? 1 : position));
+      item.element.style.setProperty('--grid-shift', `${motion.matches ? 0 : position * 52}px`);
+    });
+    heroParallax.seek(motion.matches ? 0 : clampProgress(window.scrollY / Math.max(sections[0].height, 1)) * 1000);
+    dials.forEach((item) => {
+      const position = clampProgress((window.scrollY + viewport * 0.95 - documentTop(item.element)) / (viewport * 0.6));
+      item.animation.seek((motion.matches ? 1 : position) * 1000);
+    });
+    scrollFrame = 0;
+  };
+  window.addEventListener('scroll', () => {
+    if (!scrollFrame) scrollFrame = requestAnimationFrame(updateProgress);
+  }, { passive: true });
+  window.addEventListener('resize', () => { measure(); updateProgress(); });
+  motion.addEventListener('change', updateProgress);
+  window.addEventListener('load', () => { measure(); updateProgress(); }, { once: true });
+  measure();
+  updateProgress();
 
-    const pointer = new THREE.Vector2();
-    const eased = new THREE.Vector2();
-
-    const makePoints = (count, createPosition, createColor, size) => {
-      const geometry = new THREE.BufferGeometry();
-      const positions = new Float32Array(count * 3);
-      const colors = new Float32Array(count * 3);
-
-      for (let i = 0; i < count; i += 1) {
-        const position = createPosition();
-        const color = createColor(position);
-        const i3 = i * 3;
-        positions[i3] = position.x;
-        positions[i3 + 1] = position.y;
-        positions[i3 + 2] = position.z;
-        colors[i3] = color.r;
-        colors[i3 + 1] = color.g;
-        colors[i3 + 2] = color.b;
-      }
-
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-      const material = new THREE.PointsMaterial({
-        size,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.92,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        sizeAttenuation: true,
+  const navLinks = document.querySelectorAll<HTMLAnchorElement>('.site-header nav a');
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      navLinks.forEach((link) => {
+        if (link.hash === `#${entry.target.id}`) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
       });
+    });
+  }, { rootMargin: '-15% 0px -55% 0px' });
+  document.querySelectorAll('main > section').forEach((section) => sectionObserver.observe(section));
 
-      return new THREE.Points(geometry, material);
-    };
-
-    const field = makePoints(
-      26000,
-      () => {
-        const z = -8 - Math.random() * 78;
-        const spread = 26 + Math.abs(z) * 1.35;
-        return new THREE.Vector3((Math.random() - 0.5) * spread, -1.65, z);
-      },
-      (position) => {
-        const horizon = THREE.MathUtils.clamp((Math.abs(position.z) - 8) / 78, 0, 1);
-        const color = new THREE.Color().setHSL(0.26, 0.92, 0.52 + horizon * 0.12);
-        if (Math.random() > 0.78) color.setRGB(0.9, 0.98, 1);
-        return color;
-      },
-      0.09
-    );
-    field.rotation.x = -0.055;
-    scene.add(field);
-
-    const stars = makePoints(
-      1400,
-      () => {
-        const radius = 35 + Math.random() * 70;
-        const theta = Math.random() * Math.PI * 2;
-        const y = 4 + Math.random() * 38;
-        return new THREE.Vector3(Math.cos(theta) * radius, y, -Math.abs(Math.sin(theta) * radius) - 12);
-      },
-      () => new THREE.Color(0.68 + Math.random() * 0.32, 0.86 + Math.random() * 0.14, 0.72 + Math.random() * 0.28),
-      0.09
-    );
-    scene.add(stars);
-
-    const createTrack = (color, width, offset, opacity) => {
-      const points = [];
-      for (let i = 0; i < 180; i += 1) {
-        const t = i / 179;
-        const z = 6 - t * 80;
-        const curve = Math.sin(t * Math.PI * 1.34 + offset) * (5.2 + t * 16);
-        points.push(new THREE.Vector3(curve - 8.5 + t * 16, -1.2 + t * 0.34, z));
-      }
-
-      const geometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 360, width, 8, false);
-      const material = new THREE.MeshBasicMaterial({
-        color,
-        transparent: true,
-        opacity,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      });
-
-      return new THREE.Mesh(geometry, material);
-    };
-
-    const whiteTrack = createTrack(0xf8fff8, 0.08, 0.05, 0.95);
-    const redTrack = createTrack(0xff2c1f, 0.055, 0.18, 0.74);
-    const hotTrack = createTrack(0xfff7e6, 0.16, 0.08, 0.34);
-    scene.add(whiteTrack, redTrack, hotTrack);
-
-    const horizon = new THREE.Mesh(
-      new THREE.PlaneGeometry(180, 18),
-      new THREE.MeshBasicMaterial({
-        color: 0x96ff3d,
-        transparent: true,
-        opacity: 0.08,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      })
-    );
-    horizon.position.set(0, -1.48, -52);
-    horizon.rotation.x = -Math.PI / 2;
-    scene.add(horizon);
-
-    const redGlow = new THREE.PointLight(0xff392c, 2.2, 38);
-    redGlow.position.set(-8, -0.5, -5);
-    scene.add(redGlow);
-
-    const resize = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height, false);
-    };
-
-    const onPointerMove = (event) => {
-      pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-      pointer.y = -((event.clientY / window.innerHeight) * 2 - 1);
-    };
-
-    window.addEventListener('resize', resize);
-    window.addEventListener('pointermove', onPointerMove);
-    resize();
-
-    const clock = new THREE.Clock();
-    const animate = () => {
-      const elapsed = clock.getElapsedTime();
-      eased.lerp(pointer, 0.045);
-
-      const fieldPositions = field.geometry.attributes.position.array;
-      for (let i = 0; i < fieldPositions.length; i += 3) {
-        fieldPositions[i + 2] += 0.055;
-        if (fieldPositions[i + 2] > 8) fieldPositions[i + 2] = -86;
-      }
-      field.geometry.attributes.position.needsUpdate = true;
-
-      stars.rotation.y = elapsed * 0.012 + eased.x * 0.025;
-      stars.material.opacity = 0.66 + Math.sin(elapsed * 0.8) * 0.18;
-      whiteTrack.material.opacity = 0.72 + Math.sin(elapsed * 3.2) * 0.22;
-      redTrack.material.opacity = 0.48 + Math.sin(elapsed * 4.1 + 1.4) * 0.22;
-      hotTrack.material.opacity = 0.2 + Math.sin(elapsed * 2.3) * 0.12;
-      whiteTrack.position.z = Math.sin(elapsed * 1.2) * 0.32;
-      redTrack.position.z = Math.cos(elapsed * 1.45) * 0.5;
-      horizon.material.opacity = 0.07 + Math.sin(elapsed * 1.4) * 0.035;
-      redGlow.position.x = -8 + Math.sin(elapsed * 1.8) * 5;
-      redGlow.position.z = -4 - Math.abs(Math.sin(elapsed * 1.15)) * 18;
-
-      camera.position.x = eased.x * 1.1;
-      camera.position.y = 8.4 + eased.y * 0.55 + Math.sin(elapsed * 0.42) * 0.12;
-      camera.position.z = 17 + Math.sin(elapsed * 0.38) * 0.34;
-      camera.lookAt(eased.x * 1.8, 0.1 + eased.y * 0.3, -30);
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-  }
+  document.querySelectorAll<HTMLElement>('.hobby__card').forEach((card) => {
+    card.addEventListener('pointermove', (event) => {
+      if (motion.matches || event.pointerType !== 'mouse') return;
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty('--pointer-x', `${event.clientX - rect.left}px`);
+      card.style.setProperty('--pointer-y', `${event.clientY - rect.top}px`);
+    });
+  });
 </script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700&display=swap');
-
   :global(html) {
-    background: #020304;
+    background: #070b10;
     scroll-behavior: smooth;
   }
 
   :global(body) {
     margin: 0;
     overflow-x: hidden;
-    background: #020304;
-    color: #f7fff0;
+    background: #070b10;
+    color: #f3f7f4;
   }
 
-  .vlog-page {
-    --acid: #b9fb4b;
-    --panel: rgba(17, 22, 17, 0.7);
-    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    min-height: 180vh;
-    position: relative;
-    overflow: hidden;
-    background:
-      radial-gradient(circle at 56% 47%, rgba(131, 219, 255, 0.26), transparent 26rem),
-      linear-gradient(180deg, #020304 0%, #061014 58%, #020304 100%);
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-  }
-
-  .vlog-scene,
-  .scanlines {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  .vlog-scene {
-    z-index: 0;
-  }
-
-  .scanlines {
-    z-index: 1;
-    pointer-events: none;
-    background:
-      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      radial-gradient(circle at 50% 48%, transparent 0 36%, rgba(0, 0, 0, 0.34) 68%, rgba(0, 0, 0, 0.74) 100%);
-    background-size: 100% 4px, 100% 100%;
-    mix-blend-mode: screen;
-    opacity: 0.46;
-  }
-
-  .topbar {
-    position: fixed;
-    z-index: 4;
-    inset: 22px 22px auto;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 24px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: rgba(220, 232, 235, 0.64);
-  }
-
-  .topbar p {
-    margin: 0;
-  }
-
-  .topbar nav {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 7px;
-  }
-
-  .topbar a,
-  .cta {
-    color: rgba(235, 244, 247, 0.86);
-    text-decoration: none;
-    background: rgba(32, 40, 45, 0.82);
-    border: 1px solid rgba(168, 188, 190, 0.16);
-    padding: 8px 10px;
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 700;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    transition: color 160ms ease, background 160ms ease, transform 160ms ease;
-  }
-
-  .topbar a:hover,
-  .cta:hover {
-    color: #0a0f0b;
-    background: var(--acid);
-    transform: translateY(-1px);
-  }
-
-  .hero {
-    position: relative;
-    z-index: 2;
-    min-height: 100vh;
-    display: grid;
-    grid-template-rows: minmax(150px, 28vh) 1fr;
-    align-items: start;
-    padding: 86px 32px 0;
+  :global(*) {
     box-sizing: border-box;
   }
 
-  .brand {
-    margin: 0;
-    color: var(--acid);
-    font-family: 'Anton', Impact, sans-serif;
-    font-size: clamp(92px, 18vw, 260px);
-    line-height: 0.78;
-    transform: scaleX(1.22);
-    transform-origin: left top;
-    text-shadow:
-      0 0 22px rgba(185, 251, 75, 0.18),
-      0 0 68px rgba(185, 251, 75, 0.16);
-    animation: brandIgnition 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-    user-select: none;
+  .vlog-page {
+    --ink: #070b10;
+    --panel: #101923;
+    --panel-strong: #142433;
+    --text: #f3f7f4;
+    --muted: #9fb3b3;
+    --cyan: #27f0d0;
+    --blue: #4d8dff;
+    --gold: #ffc84a;
+    --green: #84ff64;
+    --coral: #ff6262;
+    --line: rgba(132, 255, 228, 0.22);
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+    min-height: 100vh;
+    background:
+      linear-gradient(rgba(39, 240, 208, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(39, 240, 208, 0.045) 1px, transparent 1px),
+      linear-gradient(135deg, #070b10 0%, #101923 48%, #1d1717 100%);
+    background-size: 36px 36px, 36px 36px, auto;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
-  .hero__copy {
-    width: min(1040px, calc(100vw - 32px));
-    justify-self: center;
-    align-self: start;
-    margin-top: clamp(10px, 8vh, 86px);
-    text-align: center;
-    animation: copyRise 900ms 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  :global(html[data-theme='light']) {
+    background: #edf7f8;
   }
 
-  .hero__tag {
+  :global(html[data-theme='light'] body) {
+    background: #edf7f8;
+    color: #102330;
+  }
+
+  :global(html[data-theme='light']) .vlog-page {
+    --ink: #edf7f8;
+    --panel: #ffffff;
+    --panel-strong: #dff1f3;
+    --text: #102330;
+    --muted: #526972;
+    --cyan: #008f82;
+    --blue: #245fc8;
+    --gold: #a36a00;
+    --green: #287a22;
+    --coral: #c13c3c;
+    --line: rgba(0, 143, 130, 0.22);
+    background:
+      linear-gradient(rgba(0, 143, 130, 0.075) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 143, 130, 0.075) 1px, transparent 1px),
+      linear-gradient(135deg, #f6fbfc 0%, #e7f3f5 48%, #fff5ec 100%);
+    background-size: 36px 36px, 36px 36px, auto;
+  }
+
+  .site-header {
+    position: fixed;
+    z-index: 20;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px clamp(18px, 4vw, 42px);
+    background: rgba(7, 11, 16, 0.72);
+    border-bottom: 1px solid rgba(39, 240, 208, 0.16);
+    backdrop-filter: blur(16px);
+  }
+
+  :global(html[data-theme='light']) .site-header {
+    background: rgba(246, 251, 252, 0.78);
+    border-bottom-color: rgba(0, 143, 130, 0.2);
+  }
+
+  .logo,
+  .site-header nav a,
+  .cta,
+  .theme-toggle {
+    min-height: 44px;
+  }
+
+  .logo {
     display: inline-flex;
-    margin: 0 0 16px;
-    color: var(--acid);
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .logo__mark {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    aspect-ratio: 1;
+    border: 1px solid rgba(39, 240, 208, 0.56);
+    border-radius: 12px;
+    color: var(--cyan);
+    background: rgba(39, 240, 208, 0.08);
+    font-family: var(--mono);
+    font-weight: 800;
+  }
+
+  .logo__text,
+  .site-header nav a,
+  .eyebrow,
+  .cta,
+  .panel-topline,
+  .fact-card span,
+  .hobby__metric,
+  .hobby__card footer {
+    font-family: var(--mono);
+  }
+
+  .logo__text {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .site-header nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .site-header nav a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 12px;
+    border: 1px solid transparent;
+    color: #c9d7d6;
+    font-size: 12px;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .site-header nav a:hover,
+  .site-header nav a:focus-visible {
+    color: var(--text);
+    border-color: rgba(39, 240, 208, 0.34);
+    outline: none;
+  }
+
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+    border: 1px solid rgba(39, 240, 208, 0.34);
+    border-radius: 999px;
+    color: #c9d7d6;
+    background: rgba(16, 25, 35, 0.78);
+    cursor: pointer;
     font-family: var(--mono);
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 800;
   }
 
-  .hero h1 {
-    margin: 0;
-    font-size: clamp(46px, 6vw, 86px);
-    line-height: 0.98;
-    color: #fbfff7;
-    text-shadow:
-      0 0 6px rgba(255, 255, 255, 0.95),
-      0 0 20px rgba(236, 255, 248, 0.62),
-      0 0 44px rgba(117, 212, 255, 0.34);
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 3px;
   }
 
-  .hero__lead {
-    width: min(590px, 100%);
-    margin: 22px auto 0;
-    color: rgba(235, 244, 247, 0.78);
-    font-size: 16px;
+  .theme-toggle__track {
+    display: inline-flex;
+    align-items: center;
+    width: 40px;
+    height: 22px;
+    padding: 3px;
+    border-radius: 999px;
+    background: rgba(39, 240, 208, 0.18);
+  }
+
+  .theme-toggle__thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 12px rgba(39, 240, 208, 0.7);
+    transition: transform 180ms ease, background 180ms ease;
+  }
+
+  .theme-toggle[aria-pressed='true'] .theme-toggle__thumb {
+    transform: translateX(18px);
+  }
+
+  :global(html[data-theme='light']) .site-header nav a,
+  :global(html[data-theme='light']) .theme-toggle {
+    color: #28444e;
+  }
+
+  :global(html[data-theme='light']) .theme-toggle {
+    background: rgba(255, 255, 255, 0.78);
+    border-color: rgba(0, 143, 130, 0.28);
+  }
+
+  :global(html[data-theme='light']) .theme-toggle__track {
+    background: rgba(0, 143, 130, 0.16);
+  }
+
+  .hero,
+  .section-band {
+    min-height: 100dvh;
+    position: relative;
+    overflow: hidden;
+    padding: clamp(92px, 9vw, 124px) clamp(20px, 6vw, 76px) clamp(64px, 8vw, 96px);
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.9fr) minmax(360px, 1.1fr);
+    align-items: center;
+    gap: clamp(32px, 6vw, 72px);
+    min-height: 94dvh;
+  }
+
+  .hero::after,
+  .section-band::after {
+    content: '';
+    position: absolute;
+    left: clamp(20px, 6vw, 76px);
+    right: clamp(20px, 6vw, 76px);
+    bottom: 34px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(39, 240, 208, 0.7), transparent);
+  }
+
+  :global(html[data-theme='light']) .hero::after,
+  :global(html[data-theme='light']) .section-band::after {
+    background: linear-gradient(90deg, transparent, rgba(0, 143, 130, 0.5), transparent);
+  }
+
+  .hero__copy,
+  .section-copy,
+  .hero-visual,
+  .profile-panel,
+  .facts-grid,
+  .hobby__grid {
+    position: relative;
+    z-index: 1;
+  }
+
+  .eyebrow {
+    margin: 0 0 18px;
+    color: var(--cyan);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  h1,
+  h2,
+  h3,
+  p {
+    margin-top: 0;
+  }
+
+  h1 {
+    max-width: 720px;
+    margin-bottom: 24px;
+    color: var(--text);
+    font-size: clamp(44px, 8vw, 96px);
+    line-height: 0.92;
+    letter-spacing: 0;
+  }
+
+  h2 {
+    max-width: 560px;
+    margin-bottom: 20px;
+    color: var(--text);
+    font-size: clamp(34px, 6vw, 72px);
+    line-height: 0.96;
+    letter-spacing: 0;
+  }
+
+  .hero__lead,
+  .section-copy p {
+    max-width: 560px;
+    color: #c9d7d6;
+    font-size: clamp(16px, 2vw, 20px);
+    font-weight: 650;
     line-height: 1.55;
-    text-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
+  }
+
+  :global(html[data-theme='light']) .hero__lead,
+  :global(html[data-theme='light']) .section-copy p,
+  :global(html[data-theme='light']) .hobby__card p {
+    color: #38525c;
   }
 
   .hero__cta {
     display: flex;
-    justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 26px;
+    gap: 12px;
+    margin-top: 34px;
   }
 
-  .cta.ghost {
-    background: rgba(5, 7, 8, 0.58);
-  }
-
-  .rail {
-    position: fixed;
-    z-index: 4;
-    left: 24px;
-    bottom: 26px;
-    width: 186px;
-    padding: 18px 18px 18px 36px;
-    box-sizing: border-box;
-    background:
-      radial-gradient(circle at 12% 10%, rgba(185, 251, 75, 0.22), transparent 36%),
-      radial-gradient(circle at 100% 100%, rgba(255, 70, 54, 0.26), transparent 40%),
-      var(--panel);
-    border: 1px solid rgba(219, 255, 197, 0.08);
-    backdrop-filter: blur(16px);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      0 22px 60px rgba(0, 0, 0, 0.38);
-  }
-
-  .rail ol {
-    list-style: none;
-    display: grid;
-    gap: 13px;
-    padding: 0;
-    margin: 0;
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 700;
-  }
-
-  .rail li {
-    position: relative;
-  }
-
-  .rail li::before {
-    content: '';
-    position: absolute;
-    left: -20px;
-    top: 0.55em;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: rgba(238, 246, 244, 0.8);
-    box-shadow: 0 0 8px rgba(238, 246, 244, 0.65);
-  }
-
-  .rail li.is-active::before {
-    width: 11px;
-    height: 11px;
-    left: -24px;
-    top: 0.18em;
-    background: var(--acid);
-    box-shadow: 0 0 18px rgba(185, 251, 75, 0.95);
-  }
-
-  .rail a {
-    color: rgba(240, 246, 242, 0.48);
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 18px;
+    border: 1px solid rgba(39, 240, 208, 0.38);
+    border-radius: 12px;
+    color: var(--text);
+    background: rgba(16, 25, 35, 0.78);
+    font-size: 12px;
+    font-weight: 800;
     text-decoration: none;
+    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
   }
 
-  .rail .is-active a {
-    color: #f8fff1;
+  :global(html[data-theme='light']) .cta {
+    color: #102330;
+    background: rgba(255, 255, 255, 0.78);
+    border-color: rgba(0, 143, 130, 0.24);
   }
 
-  .section-band {
-    position: relative;
-    z-index: 2;
-    padding: 12vh 8vw;
-    background: linear-gradient(180deg, rgba(3, 5, 4, 0.72), rgba(3, 5, 4, 0.94));
+  .cta:hover,
+  .cta:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(39, 240, 208, 0.9);
+    outline: none;
+  }
+
+  .cta--primary {
+    color: #06110f;
+    background: linear-gradient(135deg, var(--cyan), var(--green));
+    border-color: transparent;
+  }
+
+  :global(html[data-theme='light']) .cta--primary {
+    color: #f7fffe;
+    background: linear-gradient(135deg, #008f82, #245fc8);
+  }
+
+  .hero-visual {
+    margin: 0;
+  }
+
+  .hero-visual img,
+  .profile-panel img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .hero-visual img {
+    aspect-ratio: 9 / 7;
+    object-fit: cover;
+    border: 1px solid rgba(39, 240, 208, 0.36);
+    border-radius: 24px;
+    background: var(--panel);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+  }
+
+  :global(html[data-theme='light']) .hero-visual img,
+  :global(html[data-theme='light']) .profile-panel img {
+    filter: saturate(0.94) brightness(1.06);
+  }
+
+  :global(html[data-theme='light']) .hero-visual img {
+    box-shadow: 0 24px 60px rgba(28, 74, 90, 0.18);
+  }
+
+  .hero-visual figcaption {
+    margin-top: 14px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+    text-align: right;
   }
 
   .intro {
     display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(240px, 0.7fr);
-    gap: 42px;
-    align-items: start;
+    grid-template-columns: minmax(260px, 0.72fr) minmax(360px, 1fr);
+    grid-template-rows: auto auto;
+    gap: clamp(24px, 4vw, 48px);
+    background:
+      linear-gradient(rgba(77, 141, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(77, 141, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(135deg, #0b1017, #121d28 52%, #171411);
+    background-size: 30px 30px, 30px 30px, auto;
   }
 
-  .intro h2,
-  .hobby h2 {
-    margin: 0 0 18px;
-    color: #f8fff2;
-    font-size: clamp(40px, 6vw, 84px);
-    line-height: 0.98;
-    text-shadow: 0 0 28px rgba(185, 251, 75, 0.12);
+  :global(html[data-theme='light']) .intro {
+    background:
+      linear-gradient(rgba(36, 95, 200, 0.075) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(36, 95, 200, 0.075) 1px, transparent 1px),
+      linear-gradient(135deg, #f8fcfd, #e9f5f7 52%, #fff7ec);
+    background-size: 30px 30px, 30px 30px, auto;
   }
 
-  .intro p,
-  .hobby header p,
-  .hobby__card p {
-    color: rgba(235, 244, 247, 0.74);
-    line-height: 1.75;
+  .profile-panel {
+    align-self: center;
+    border: 1px solid rgba(39, 240, 208, 0.3);
+    border-radius: 24px;
+    padding: 14px;
+    background: rgba(8, 15, 20, 0.58);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
   }
 
-  .intro__card,
-  .hobby__card {
-    background: rgba(17, 22, 17, 0.72);
-    border: 1px solid rgba(219, 255, 197, 0.1);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 22px 60px rgba(0, 0, 0, 0.28);
-    backdrop-filter: blur(14px);
+  :global(html[data-theme='light']) .profile-panel {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(0, 143, 130, 0.24);
+    box-shadow: 0 22px 50px rgba(28, 74, 90, 0.16);
   }
 
-  .intro__card {
-    padding: 24px;
+  .panel-topline {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 4px 6px 14px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
   }
 
-  .intro__card h3,
-  .hobby__card h3 {
-    margin: 0 0 14px;
-    color: var(--acid);
-    font-family: var(--mono);
-    font-size: 14px;
-  }
-
-  .intro__card ul {
-    list-style: none;
+  .facts-grid {
+    grid-column: 1 / -1;
     display: grid;
-    gap: 12px;
-    padding: 0;
-    margin: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
   }
 
-  .intro__card li {
-    color: rgba(247, 255, 240, 0.86);
-    border-top: 1px solid rgba(219, 255, 197, 0.12);
-    padding-top: 12px;
+  .fact-card,
+  .hobby__card {
+    border: 1px solid rgba(39, 240, 208, 0.28);
+    border-radius: 18px;
+    background:
+      linear-gradient(90deg, transparent 0 92%, rgba(39, 240, 208, 0.07) 92%),
+      linear-gradient(180deg, rgba(16, 25, 35, 0.92), rgba(11, 16, 23, 0.78));
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.24);
   }
 
-  .hobby header {
-    max-width: 760px;
+  :global(html[data-theme='light']) .fact-card,
+  :global(html[data-theme='light']) .hobby__card {
+    border-color: rgba(0, 143, 130, 0.22);
+    background:
+      linear-gradient(90deg, transparent 0 92%, rgba(0, 143, 130, 0.065) 92%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(230, 244, 247, 0.78));
+    box-shadow: 0 18px 34px rgba(28, 74, 90, 0.14);
+  }
+
+  .fact-card {
+    min-height: 132px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .fact-card span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .fact-card strong {
+    color: var(--text);
+    font-size: clamp(20px, 3vw, 30px);
+    line-height: 1.1;
+  }
+
+  .fact-card--gold {
+    border-color: rgba(255, 200, 74, 0.35);
+  }
+
+  .fact-card--green {
+    border-color: rgba(132, 255, 100, 0.3);
+  }
+
+  .hobby {
+    display: grid;
+    align-content: center;
+    gap: clamp(28px, 5vw, 54px);
+    background:
+      linear-gradient(rgba(39, 240, 208, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(39, 240, 208, 0.045) 1px, transparent 1px),
+      linear-gradient(145deg, #070b10, #111c27 46%, #201618);
+    background-size: 34px 34px, 34px 34px, auto;
+  }
+
+  :global(html[data-theme='light']) .hobby {
+    background:
+      linear-gradient(rgba(0, 143, 130, 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 143, 130, 0.07) 1px, transparent 1px),
+      linear-gradient(145deg, #f7fbfc, #e7f4f6 48%, #fff4f0);
+    background-size: 34px 34px, 34px 34px, auto;
   }
 
   .hobby__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 18px;
-    margin-top: 30px;
   }
 
   .hobby__card {
+    min-height: 318px;
     padding: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    position: relative;
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  .hobby__card::after {
+    content: '';
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    top: 96px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(39, 240, 208, 0.72), transparent);
+  }
+
+  .hobby__card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(39, 240, 208, 0.78);
+    box-shadow: 0 24px 46px rgba(0, 0, 0, 0.32), 0 0 28px rgba(39, 240, 208, 0.1);
+  }
+
+  .hobby__dial {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    aspect-ratio: 1;
+    border: 1px solid rgba(39, 240, 208, 0.44);
+    border-radius: 50%;
+    background: conic-gradient(from 120deg, var(--cyan), transparent 28%, var(--gold), transparent 72%, var(--blue));
+  }
+
+  .hobby__dial span {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    color: var(--text);
+    background: #0a1118;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  :global(html[data-theme='light']) .hobby__dial span {
+    color: #f7fffe;
+    background: #102330;
+  }
+
+  .hobby__metric {
+    margin-bottom: 10px;
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .hobby__card h3 {
+    margin-bottom: 0;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 18px;
+    line-height: 1.2;
   }
 
   .hobby__card p {
-    margin: 0;
+    color: #c9d7d6;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.42;
   }
 
-  @keyframes brandIgnition {
-    from {
-      opacity: 0;
-      filter: blur(18px);
-      transform: translateY(-28px) scaleX(1.22);
-    }
-    to {
-      opacity: 1;
-      filter: blur(0);
-      transform: translateY(0) scaleX(1.22);
-    }
+  .hobby__card footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
   }
 
-  @keyframes copyRise {
-    from {
-      opacity: 0;
-      filter: blur(10px);
-      transform: translateY(34px);
-    }
-    to {
-      opacity: 1;
-      filter: blur(0);
-      transform: translateY(0);
-    }
+  .hobby__card footer strong {
+    color: var(--cyan);
+    font-size: 12px;
   }
 
-  @media (max-width: 840px) {
-    .topbar {
-      inset: 16px 14px auto;
-    }
-
-    .topbar p {
-      display: none;
-    }
-
-    .topbar nav {
-      width: 100%;
-      justify-content: flex-start;
-    }
-
-    .topbar a {
-      padding: 6px 7px;
-      font-size: 10px;
+  @media (max-width: 980px) {
+    .hero,
+    .intro {
+      grid-template-columns: 1fr;
     }
 
     .hero {
-      grid-template-rows: auto 1fr;
-      padding: 74px 18px 0;
+      min-height: auto;
+      padding-top: 108px;
     }
 
-    .brand {
-      font-size: clamp(66px, 24vw, 118px);
-      transform: scaleX(1.05);
+    .hero-visual img {
+      max-height: 520px;
+      object-fit: cover;
     }
 
-    .hero__copy {
-      margin-top: 12vh;
-    }
-
-    .hero h1 {
-      font-size: clamp(38px, 12vw, 58px);
-    }
-
-    .hero__lead {
-      font-size: 14px;
-    }
-
-    .rail {
-      left: 14px;
-      right: 14px;
-      bottom: 14px;
-      width: auto;
-      padding: 12px 14px;
-    }
-
-    .rail ol {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px 12px;
-      font-size: 9px;
-    }
-
-    .rail li::before {
-      display: none;
-    }
-
-    .intro,
+    .facts-grid,
     .hobby__grid {
       grid-template-columns: 1fr;
     }
 
-    .section-band {
-      padding: 10vh 6vw;
+    .hobby__card {
+      min-height: 250px;
     }
   }
 
+  @media (max-width: 700px) {
+    .site-header {
+      position: absolute;
+      align-items: flex-start;
+      padding: 16px;
+    }
+
+    .logo__text {
+      display: none;
+    }
+
+    .site-header nav {
+      flex-wrap: wrap;
+    }
+
+    .site-header nav a {
+      min-height: 38px;
+      padding: 0 8px;
+      font-size: 11px;
+    }
+
+    .theme-toggle {
+      min-height: 38px;
+      padding: 0 8px;
+    }
+
+    .theme-toggle__text {
+      display: none;
+    }
+
+    .hero,
+    .section-band {
+      padding: 94px 20px 64px;
+    }
+
+    .hero__cta {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .hero-visual figcaption {
+      text-align: left;
+    }
+
+    .panel-topline {
+      flex-direction: column;
+    }
+
+    .fact-card,
+    .hobby__card {
+      border-radius: 14px;
+    }
+  }
+
+  /* Motion and typography share the existing light/dark color tokens. */
+  .reading-progress {
+    position: fixed;
+    z-index: 30;
+    inset: 0 0 auto;
+    height: 2px;
+    background: var(--cyan);
+    transform: scaleX(var(--progress, 0));
+    transform-origin: left;
+    pointer-events: none;
+  }
+
+  .hero { min-height: 80dvh; gap: 48px; padding-top: 150px; padding-bottom: 80px; }
+  .hero-motion { min-width: 0; }
+  .scroll-linked { transform-origin: center; }
+  .hobby__card.scroll-linked { transition: border-color 180ms ease, box-shadow 180ms ease; }
+  .intro, .hobby { background-position: 0 var(--grid-shift, 0px), 0 var(--grid-shift, 0px), 0 0; }
+  .section-band::after {
+    transform: scaleX(var(--section-progress, 0));
+    transform-origin: left;
+    height: 2px;
+  }
+  .section-band { min-height: auto; padding-top: 100px; padding-bottom: 100px; scroll-margin-top: 72px; }
+  h1 { font-size: 88px; line-height: 1.03; font-weight: 750; }
+  h1 span { display: block; margin-top: 24px; font-size: 38px; line-height: 1.2; font-weight: 450; color: var(--muted); }
+  h2 { font-size: 48px; line-height: 1.08; }
+  .hero__lead, .section-copy p { font-size: 18px; font-weight: 400; line-height: 1.75; }
+  .section-copy .eyebrow { font-size: 12px; font-weight: 700; color: var(--cyan); }
+  .hero__copy { animation: arrival 800ms both; }
+  .hero-visual { animation: arrival 1000ms 120ms both; }
+  .hero-visual img { border: 0; border-radius: 8px; box-shadow: none; }
+  .hero-visual::after {
+    content: ''; position: absolute; top: 0; bottom: 30px; left: 0; width: 1px;
+    background: var(--cyan); box-shadow: 0 0 18px var(--cyan); opacity: 0;
+    animation: scan 3s 600ms ease-in-out; pointer-events: none;
+  }
+  .logo__mark, .cta, .profile-panel, .fact-card, .hobby__card { border-radius: 8px; }
+  .site-header nav a { position: relative; }
+  .site-header nav a::after {
+    content: ''; position: absolute; bottom: 3px; left: 12px; right: 12px; height: 2px;
+    background: var(--cyan); transform: scaleX(0); transition: transform 220ms;
+  }
+  .site-header nav a[aria-current]::after { transform: scaleX(1); }
+  .cta { gap: 16px; min-height: 48px; }
+  .cta--primary { background: var(--cyan); }
+  :global(html[data-theme='light']) .cta--primary { background: #00786e; }
+  .profile-panel { background: transparent; box-shadow: none; border: 0; padding: 0; }
+  :global(html[data-theme='light']) .profile-panel { background: transparent; box-shadow: none; border: 0; }
+  .facts-grid { border-top: 1px solid var(--line); padding-top: 28px; }
+  .fact-card { min-height: 104px; gap: 18px; box-shadow: none; }
+  .fact-card strong { font-size: 23px; font-weight: 550; }
+  .hobby__card { gap: 22px; min-height: 330px; box-shadow: none; }
+  .hobby__card p { font-size: 16px; font-weight: 400; line-height: 1.65; margin-bottom: 0; }
+  .hobby__card .hobby__metric { font-size: 11px; color: var(--gold); margin-bottom: 8px; }
+  .hobby__card::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    background: radial-gradient(240px circle at var(--pointer-x, 50%) var(--pointer-y, 50%), rgba(39,240,208,.12), transparent 80%);
+    transition: opacity 250ms;
+  }
+  .hobby__card:hover::before { opacity: 1; }
+  .hobby__dial { position: relative; background: none; border-color: var(--line); }
+  .hobby__dial::before { content: ''; position: absolute; inset: -1px; border: 2px solid transparent; border-top-color: var(--cyan); border-bottom-color: var(--gold); border-radius: 50%; transition: transform 900ms ease; }
+  .hobby__card:hover .hobby__dial::before { transform: rotate(180deg); }
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 700ms var(--reveal-delay) ease, transform 700ms var(--reveal-delay) cubic-bezier(.2,.7,.2,1); }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+  .site-footer { display: flex; justify-content: space-between; gap: 24px; padding: 32px 6%; border-top: 1px solid var(--line); font: 12px var(--mono); color: var(--muted); }
+  .site-footer a { color: var(--text); text-decoration: none; }
+  @keyframes arrival { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes scan { 0% { left: 0; opacity: 0; } 15%, 75% { opacity: .65; } 100% { left: 100%; opacity: 0; } }
+  @media (max-width: 980px) {
+    .hero { padding-top: 124px; min-height: auto; }
+    h1 { font-size: 72px; }
+    .hero-visual { max-width: 640px; width: 100%; }
+    .facts-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .fact-card strong { font-size: 20px; overflow-wrap: anywhere; }
+    .hobby__card { min-height: 280px; }
+  }
+  @media (max-width: 700px) {
+    .site-header { position: sticky; align-items: center; gap: 8px; }
+    .site-header nav { gap: 0; }
+    .hero { padding-top: 40px; gap: 32px; }
+    h1 { font-size: 60px; }
+    h1 span { font-size: 28px; margin-top: 18px; }
+    h2 { font-size: 36px; }
+    .hero__lead, .section-copy p { font-size: 16px; }
+    .section-copy .eyebrow { font-size: 11px; }
+    .section-band { padding-top: 64px; padding-bottom: 64px; }
+    .facts-grid { grid-template-columns: 1fr; gap: 0; }
+    .fact-card { flex-direction: row; align-items: center; min-height: 80px; padding: 16px 0; border: 0; border-bottom: 1px solid var(--line); background: transparent !important; box-shadow: none !important; border-radius: 0; }
+    .fact-card span { flex: 0 0 100px; }
+    .fact-card strong { font-size: 18px; text-align: right; }
+    .site-footer { flex-wrap: wrap; }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .brand,
-    .hero__copy {
-      animation: none;
+    :global(html) { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; }
+    .hero__copy, .hero-visual, .hero-visual::after { animation: none; }
+    .hobby__card:hover .hobby__dial::before { transform: none; }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 1ms !important;
     }
   }
 </style>
