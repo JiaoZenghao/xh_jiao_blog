@@ -1,5 +1,6 @@
 ---
 import MotionScene from './MotionScene.astro';
+import ScrollStage from './ScrollStage.astro';
 
 const navItems = [
   { label: 'Meet me', href: '#introduction' },
@@ -71,6 +72,8 @@ const hobbies = [
 
     <div class="hero-motion"><MotionScene /></div>
   </section>
+
+  <ScrollStage />
 
   <section class="intro section-band" id="introduction">
     <div class="section-copy">
@@ -226,6 +229,13 @@ const hobbies = [
   }, { passive: true });
   window.addEventListener('resize', () => { measure(); updateProgress(); });
   motion.addEventListener('change', updateProgress);
+  // The stage can expand/collapse without a window resize (motion preference,
+  // short viewport, or static fallback). Its notification follows actual layout.
+  document.addEventListener('scroll-stage:layout', (event) => {
+    if (!(event.target instanceof HTMLElement) || !event.target.matches('[data-scroll-stage]')) return;
+    measure();
+    updateProgress();
+  });
   window.addEventListener('load', () => { measure(); updateProgress(); }, { once: true });
   measure();
   updateProgress();

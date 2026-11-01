@@ -1,9 +1,9 @@
 ---
-interface Props { compact?: boolean; label?: string; variant?: 'orbit' | 'signal'; }
-const { compact = false, label = 'TT / EXPLORER', variant = 'orbit' } = Astro.props;
+interface Props { compact?: boolean; label?: string; variant?: 'orbit' | 'signal'; driver?: 'auto' | 'scroll'; }
+const { compact = false, label = 'TT / EXPLORER', variant = 'orbit', driver = 'auto' } = Astro.props;
 ---
 
-<div class:list={['motion-scene', { 'motion-scene--compact': compact, 'motion-scene--signal': variant === 'signal' }]} data-motion-scene data-variant={variant}>
+<div class:list={['motion-scene', { 'motion-scene--compact': compact, 'motion-scene--signal': variant === 'signal' }]} data-motion-scene data-variant={variant} data-driver={driver}>
   <div class="motion-art" aria-hidden="true">
     {variant === 'signal' ? <div class="signal-art">
       <div class="signal-heading"><span>01 / FREQUENCY</span><span>TT-011</span></div>
@@ -34,17 +34,17 @@ const { compact = false, label = 'TT / EXPLORER', variant = 'orbit' } = Astro.pr
     <span class="motion-cross motion-cross--bottom">+</span>
     </>}
   </div>
-  <div class="motion-controls">
+  {driver === 'auto' && <div class="motion-controls">
     <span class="motion-label">{label}</span>
     <button type="button" data-motion-pause aria-pressed="false">Pause animation</button>
     <button type="button" data-motion-replay>Replay</button>
-  </div>
+  </div>}
 </div>
 
 <script>
   import { animate, createTimeline, stagger } from 'animejs';
 
-  document.querySelectorAll<HTMLElement>('[data-motion-scene]').forEach((scene) => {
+  document.querySelectorAll<HTMLElement>('[data-motion-scene]:not([data-driver="scroll"])').forEach((scene) => {
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
     const pauseButton = scene.querySelector<HTMLButtonElement>('[data-motion-pause]')!;
     const replayButton = scene.querySelector<HTMLButtonElement>('[data-motion-replay]')!;
@@ -124,6 +124,10 @@ const { compact = false, label = 'TT / EXPLORER', variant = 'orbit' } = Astro.pr
 <style>
   .motion-scene { width: 100%; position: relative; min-width: 0; }
   .motion-art { width: min(100%, 520px); aspect-ratio: 1; position: relative; margin: auto; transition: transform 400ms ease-out; }
+  /* The owning arena supplies a size container, so the shared square fits both
+     its remaining height and width without changing Hero's default sizing. */
+  [data-driver='scroll'] { height: 100%; display: grid; place-items: center; }
+  [data-driver='scroll'] .motion-art { width: min(100cqw, 100cqh, 520px); transition: none; }
   .motion-scene--compact .motion-art { max-width: 380px; }
   .motion-scene--signal .motion-art { max-width: none; aspect-ratio: 1.45; }
   .signal-art { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 22px; padding: 24px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
