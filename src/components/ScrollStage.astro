@@ -1,0 +1,223 @@
+---
+import MotionScene from './MotionScene.astro';
+
+const interests = [
+  { name: 'Move', detail: 'Outside is a good place to start.', note: 'Find a little adventure', tone: 'cyan', symbol: '↗' },
+  { name: 'Build', detail: 'Small pieces. Brand-new worlds.', note: 'Make something your own', tone: 'gold', symbol: '+' },
+  { name: 'Learn', detail: 'Every question opens a door.', note: 'Follow the what-if', tone: 'blue', symbol: '✳' },
+];
+---
+
+<!-- A div keeps this stage out of Welcome's main > section animation ownership. -->
+<div class="scroll-stage" data-scroll-stage>
+  <section class="stage-panel" aria-labelledby="stage-heading">
+    <div class="stage-content">
+      <header class="stage-heading">
+        <p class="stage-eyebrow">Field notes / A curious state of mind</p>
+        <h2 id="stage-heading">Follow a little curiosity.</h2>
+        <p class="stage-lead">One adventure leads to the next.</p>
+      </header>
+
+      <div class="stage-arena" aria-hidden="true">
+        <MotionScene driver="scroll" />
+      </div>
+
+      <div class="stage-cards">
+        {interests.map((interest, index) => (
+          <article class={`stage-card stage-card--${interest.tone}`}>
+            <span class="stage-card__symbol" aria-hidden="true">{interest.symbol}</span>
+            <div>
+              <p class="stage-card__index">0{index + 1} / {interest.note}</p>
+              <h3>{interest.name}</h3>
+              <p class="stage-card__detail">{interest.detail}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div class="stage-ending">
+        <p class="stage-caption">Different interests. <strong>One curious me.</strong></p>
+        <a class="stage-hint" href="#introduction">Scroll to explore <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="stage-status" aria-hidden="true">
+        <div class="stage-phases"><span>01 Gather</span><span>02 Explore</span><span>03 Connect</span></div>
+        <div class="stage-meter"><span></span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  import { animate, createTimeline } from 'animejs';
+  import { stageProgress, primeStageTimeline } from '../lib/scroll-stage.mjs';
+  import { createScrollOrbit } from '../lib/motion-orbit.mjs';
+  import { addStageCards } from '../lib/scroll-stage-cards.mjs';
+
+  document.querySelectorAll<HTMLElement>('[data-scroll-stage]').forEach((root) => {
+    const panel = root.querySelector<HTMLElement>('.stage-panel')!;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // Short viewports retain the readable static composition, never a clipped sticky panel.
+    const tallViewport = window.matchMedia('(min-height: 700px)');
+    const find = (selector: string) => root.querySelectorAll<HTMLElement>(selector);
+    let timeline: ReturnType<typeof createTimeline> | undefined;
+    let visual: ReturnType<typeof createScrollOrbit> | undefined;
+    let top = 0;
+    let travel = 0;
+    let frame = 0;
+    let needsMeasure = true;
+
+    const render = () => {
+      frame = 0;
+      if (!timeline) return;
+      if (needsMeasure) {
+        top = root.getBoundingClientRect().top + window.scrollY;
+        travel = root.offsetHeight - panel.offsetHeight;
+        needsMeasure = false;
+      }
+      const progress = stageProgress(window.scrollY, top, travel);
+      // Every visual state is a pure function of position, including reverse traversal.
+      timeline.seek(progress * timeline.duration, true);
+      visual?.seek(progress * visual.duration, true);
+      root.dataset.phase = progress < 0.3 ? '1' : progress < 0.75 ? '2' : '3';
+    };
+    const schedule = (measure = false) => {
+      needsMeasure ||= measure;
+      if (timeline && !frame) frame = requestAnimationFrame(render);
+    };
+
+    const syncMotion = () => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+      root.classList.remove('is-enhanced');
+      delete root.dataset.phase;
+      timeline?.revert();
+      timeline = undefined;
+      visual?.revert();
+      visual = undefined;
+      if (reducedMotion.matches || !tallViewport.matches) return;
+
+      try {
+        timeline = createTimeline({ autoplay: false, defaults: { ease: 'linear' } });
+        const scene = root.querySelector<HTMLElement>('[data-motion-scene][data-driver="scroll"]')!;
+        const target = (selector: string) => scene.querySelector<HTMLElement>(selector)!;
+        visual = createScrollOrbit({
+          outer: target('.motion-ring--outer'), inner: target('.motion-ring--inner'),
+          orbit: target('.motion-orbit'), grid: target('.motion-grid'),
+          cells: scene.querySelectorAll<HTMLElement>('.motion-cell'),
+        });
+        addStageCards(timeline, find('.stage-card'));
+        timeline.add(find('.stage-caption'), { y: [16, 0], opacity: [0, 1], duration: 250 }, 750);
+        // Sync a paused animation into the same 1000-unit timeline; no independent playback.
+        timeline.sync(animate(find('.stage-meter span'), {
+          scaleX: [0, 1], duration: 1000, ease: 'linear', autoplay: false,
+        }), 0);
+        primeStageTimeline(timeline);
+        root.classList.add('is-enhanced');
+        needsMeasure = true;
+        render();
+      } catch (error) {
+        // Initialization failure must leave useful content, not an empty scroll track.
+        timeline?.revert();
+        timeline = undefined;
+        visual?.revert();
+        visual = undefined;
+        root.classList.remove('is-enhanced');
+        console.warn('Scroll stage retained its static layout.', error);
+      }
+    };
+
+    window.addEventListener('scroll', () => schedule(), { passive: true });
+    window.addEventListener('resize', () => schedule(true));
+    window.addEventListener('load', () => schedule(true), { once: true });
+    reducedMotion.addEventListener('change', syncMotion);
+    tallViewport.addEventListener('change', syncMotion);
+    let layoutHeight = -1;
+    const observer = new ResizeObserver((entries) => {
+      schedule(true);
+      // ResizeObserver runs after layout, including CSS media-query changes and
+      // static fallback. Notify only for root height changes, not animation writes.
+      const entry = entries.find((entry) => entry.target === root);
+      if (entry && entry.contentRect.height !== layoutHeight) {
+        layoutHeight = entry.contentRect.height;
+        root.dispatchEvent(new CustomEvent('scroll-stage:layout', { bubbles: true }));
+      }
+    });
+    observer.observe(root);
+    observer.observe(panel);
+    observer.observe(document.body);
+    document.fonts.ready.then(() => schedule(true));
+    syncMotion();
+  });
+</script>
+
+<style>
+  .scroll-stage {
+    position: relative;
+    color: var(--text, #f3f7f4);
+    background: var(--ink, #070b10);
+    border-block: 1px solid var(--line, #284442);
+  }
+  .stage-panel { padding: 72px clamp(20px, 6vw, 76px) 40px; }
+  .stage-content { width: min(100%, 1120px); margin-inline: auto; }
+  .stage-heading { position: relative; z-index: 1; text-align: center; }
+  .stage-eyebrow, .stage-card__index, .stage-status, .stage-hint {
+    font-family: var(--mono, monospace);
+  }
+  .stage-eyebrow { margin: 0 0 12px; color: var(--cyan); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }
+  h2 { margin: 0; font-size: clamp(30px, 4.7vw, 62px); font-weight: 550; line-height: 1.08; letter-spacing: -0.045em; }
+  .stage-lead { margin: 14px 0 0; color: var(--muted); font-size: 15px; }
+  .stage-arena { position: relative; height: 210px; container-type: size; }
+  .stage-cards { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .stage-card { --accent: var(--cyan); display: flex; align-items: flex-start; gap: 16px; min-width: 0; padding: 24px; border: 1px solid var(--line); border-top: 2px solid var(--accent); border-radius: 12px; background: var(--panel); }
+  .stage-card--gold { --accent: var(--gold); }
+  .stage-card--blue { --accent: var(--blue); }
+  .stage-card__symbol { flex-shrink: 0; color: var(--accent); font-size: 28px; line-height: 1; }
+  .stage-card__index { margin: 0 0 12px; color: var(--muted); font-size: 9px; line-height: 1.5; }
+  h3 { margin: 0 0 8px; font-size: 27px; font-weight: 550; letter-spacing: -0.03em; }
+  .stage-card__detail { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .stage-ending { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+  .stage-caption { margin: 0; color: var(--muted); font-size: clamp(16px, 2vw, 22px); }
+  .stage-caption strong { color: var(--text); font-weight: 500; }
+  .stage-hint { display: none; align-items: center; gap: 16px; min-height: 44px; color: var(--cyan); text-decoration: none; font-size: 10px; }
+  .stage-hint:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
+  .stage-status { display: none; margin-top: 12px; }
+  .stage-phases { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 10px; color: var(--muted); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .stage-meter { height: 2px; background: var(--line); }
+  .stage-meter span { display: block; height: 100%; background: var(--cyan); transform-origin: left; }
+  [data-phase='1'] .stage-phases span:nth-child(1),
+  [data-phase='2'] .stage-phases span:nth-child(2),
+  [data-phase='3'] .stage-phases span:nth-child(3) { color: var(--cyan); }
+
+  @media (prefers-reduced-motion: no-preference) and (min-height: 700px) {
+    .is-enhanced { height: 260svh; }
+    .is-enhanced .stage-panel { position: sticky; top: 0; height: 100svh; padding-top: 100px; padding-bottom: 24px; }
+    .is-enhanced .stage-content { height: 100%; display: flex; flex-direction: column; }
+    .is-enhanced .stage-arena { flex: 1; min-height: 0; }
+    .is-enhanced .stage-status { display: block; }
+    .is-enhanced .stage-hint { display: inline-flex; }
+  }
+  @media (max-width: 700px) {
+    .stage-panel { padding: 48px 20px 32px; }
+    .stage-eyebrow { font-size: 8px; letter-spacing: 0.1em; }
+    .stage-lead { margin-top: 10px; font-size: 13px; }
+    .stage-arena { height: 170px; }
+    .stage-cards { grid-template-columns: 1fr; gap: 8px; }
+    .stage-card { align-items: center; gap: 14px; padding: 12px 16px; border-radius: 8px; }
+    .stage-card__symbol { width: 28px; text-align: center; }
+    .stage-card__index { margin-bottom: 3px; font-size: 8px; }
+    h3 { font-size: 21px; margin-bottom: 2px; }
+    .stage-card__detail { font-size: 12px; }
+    .stage-ending { margin-top: 16px; gap: 4px; }
+    .stage-hint { min-height: 36px; }
+  }
+  @media (max-width: 700px) and (prefers-reduced-motion: no-preference) and (min-height: 700px) {
+    .is-enhanced { height: 220svh; }
+    .is-enhanced .stage-panel { padding-top: 90px; padding-bottom: 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-stage { height: auto; }
+    .stage-panel { position: static; height: auto; }
+    .stage-card, .stage-caption { transform: none !important; opacity: 1 !important; }
+    .stage-status, .stage-hint { display: none; }
+  }
+</style>

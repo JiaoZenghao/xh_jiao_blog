@@ -21,8 +21,10 @@ test('hero and profile have different scenes', () => {
   assert.ok(source.includes('<MotionScene variant="signal"'));
 });
 
-test('animation controls are scoped per scene', () => {
-  assert.ok(motion.includes("querySelectorAll<HTMLElement>('[data-motion-scene]').forEach"));
+test('animation controls are scoped per automatic scene and exclude scroll-owned scenes', () => {
+  assert.ok(motion.includes(`querySelectorAll<HTMLElement>('[data-motion-scene]:not([data-driver="scroll"])').forEach`));
+  assert.ok(motion.includes("driver = 'auto'"), 'existing scenes retain automatic playback by default');
+  assert.ok(motion.includes("driver === 'auto' && <div class=\"motion-controls\""), 'scroll scenes must not render automatic playback controls');
   assert.ok(motion.includes("scene.querySelector<HTMLButtonElement>('[data-motion-pause]')"));
   assert.ok(motion.includes("scene.querySelector<HTMLButtonElement>('[data-motion-replay]')"));
   assert.ok(motion.includes("pauseButton.setAttribute('aria-pressed'"));
