@@ -25,3 +25,5 @@ pnpm-debug.log*
 
 # local agent workspace metadata
 .claude/
+.superpowers/
+.worktrees/

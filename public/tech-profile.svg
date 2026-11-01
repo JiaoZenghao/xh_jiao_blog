@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="560" viewBox="0 0 720 560" role="img" aria-labelledby="title desc">
+  <title id="title">Futuristic vlog profile dashboard</title>
+  <desc id="desc">A dark technology dashboard with a glowing planet, profile cards, scan lines, and colorful activity signals.</desc>
+  <defs>
+    <linearGradient id="bg" x1="48" x2="672" y1="42" y2="520">
+      <stop stop-color="#172838"/>
+      <stop offset=".58" stop-color="#0b1118"/>
+      <stop offset="1" stop-color="#221719"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="84" x2="632" y1="0" y2="0">
+      <stop stop-color="#27f0d0" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#27f0d0"/>
+      <stop offset="1" stop-color="#27f0d0" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="planet" cx="45%" cy="38%" r="58%">
+      <stop stop-color="#f4f7ff"/>
+      <stop offset=".23" stop-color="#27f0d0"/>
+      <stop offset=".68" stop-color="#4d8dff"/>
+      <stop offset="1" stop-color="#0a1118"/>
+    </radialGradient>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M30 0H0v30" fill="none" stroke="#27f0d0" stroke-opacity=".11"/>
+    </pattern>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="720" height="560" rx="34" fill="url(#bg)"/>
+  <rect x="34" y="34" width="652" height="492" rx="26" fill="url(#grid)" opacity=".8"/>
+  <path d="M84 98h552M84 462h552" stroke="url(#cyan)" stroke-width="2"/>
+  <path d="M104 132h104M104 154h72M104 176h132" stroke="#9fb3b3" stroke-width="8" stroke-linecap="round" opacity=".55"/>
+  <g filter="url(#glow)">
+    <circle cx="406" cy="272" r="122" fill="url(#planet)"/>
+    <circle cx="406" cy="272" r="150" fill="none" stroke="#27f0d0" stroke-opacity=".72" stroke-width="2" stroke-dasharray="20 12"/>
+    <circle cx="406" cy="272" r="184" fill="none" stroke="#ffc84a" stroke-opacity=".42" stroke-width="2" stroke-dasharray="5 12"/>
+    <path d="M220 283c62-66 256-100 360-21" fill="none" stroke="#f3f7f4" stroke-opacity=".42" stroke-width="3"/>
+    <path d="M248 321c84 42 234 43 326-19" fill="none" stroke="#27f0d0" stroke-opacity=".55" stroke-width="3"/>
+  </g>
+  <g fill="#0a1118" stroke="#27f0d0" stroke-opacity=".52">
+    <rect x="84" y="330" width="190" height="112" rx="18"/>
+    <rect x="492" y="118" width="144" height="94" rx="16"/>
+    <rect x="500" y="350" width="136" height="88" rx="16"/>
+  </g>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="800">
+    <text x="108" y="366" fill="#27f0d0" font-size="13">MISSION LOG</text>
+    <text x="108" y="396" fill="#f3f7f4" font-size="27">TT-011</text>
+    <text x="108" y="420" fill="#9fb3b3" font-size="12">travel / learn / build</text>
+    <text x="516" y="154" fill="#ffc84a" font-size="12">SIGNAL</text>
+    <text x="516" y="184" fill="#f3f7f4" font-size="25">98%</text>
+    <text x="524" y="384" fill="#84ff64" font-size="12">STATUS</text>
+    <text x="524" y="414" fill="#f3f7f4" font-size="22">ONLINE</text>
+  </g>
+  <g fill="none" stroke-linecap="round">
+    <path d="M274 386h70l45-66" stroke="#27f0d0" stroke-width="2"/>
+    <path d="M492 164h-62l-24 42" stroke="#ffc84a" stroke-width="2"/>
+    <path d="M500 394h-68l-30-60" stroke="#84ff64" stroke-width="2"/>
+  </g>
+</svg>

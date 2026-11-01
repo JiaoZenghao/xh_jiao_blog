@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" viewBox="0 0 760 420" role="img" aria-labelledby="title desc">
+  <title id="title">Adventure data scan</title>
+  <desc id="desc">A technology style scan panel that connects favorite color, dream trip, and snack data around a central adventure core.</desc>
+  <defs>
+    <linearGradient id="panel" x1="40" x2="720" y1="40" y2="380">
+      <stop stop-color="#172838"/>
+      <stop offset=".55" stop-color="#121d28"/>
+      <stop offset="1" stop-color="#0a1118"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="110" x2="650" y1="0" y2="0">
+      <stop stop-color="#27f0d0" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#27f0d0" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#27f0d0" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="core" cx="50%" cy="50%" r="50%">
+      <stop stop-color="#f3f7f4"/>
+      <stop offset=".24" stop-color="#27f0d0"/>
+      <stop offset=".72" stop-color="#4d8dff"/>
+      <stop offset="1" stop-color="#4d8dff" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="scanGrid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M28 0H0v28" fill="none" stroke="#27f0d0" stroke-opacity=".12"/>
+    </pattern>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect x="18" y="18" width="724" height="384" rx="28" fill="url(#panel)" stroke="#27f0d0" stroke-opacity=".48"/>
+  <rect x="42" y="42" width="676" height="336" fill="url(#scanGrid)"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M72 86V62h42M688 86V62h-42M72 334v24h42M688 334v24h-42" stroke="#27f0d0" stroke-width="2"/>
+    <path d="M82 132h596M82 210h596M82 288h596" stroke="#8be8ff" stroke-opacity=".2"/>
+    <rect x="112" y="202" width="536" height="6" rx="3" fill="url(#beam)" stroke="none"/>
+  </g>
+  <g filter="url(#glow)">
+    <circle cx="380" cy="210" r="116" fill="url(#core)" opacity=".62"/>
+    <circle cx="380" cy="210" r="102" fill="none" stroke="#27f0d0" stroke-width="2" stroke-dasharray="18 9"/>
+    <circle cx="380" cy="210" r="70" fill="none" stroke="#ffc84a" stroke-width="2" stroke-dasharray="46 16"/>
+    <path d="M284 205c30-64 166-76 208-14 42 62-68 112-160 85-92-28-88-70-48-71Z" fill="none" stroke="#f3f7f4" stroke-opacity=".42" stroke-width="3"/>
+    <path d="M320 116c82 2 156 58 146 112-10 55-102 92-154 39s-54-153 8-151Z" fill="none" stroke="#4d8dff" stroke-opacity=".62" stroke-width="3"/>
+    <circle cx="380" cy="210" r="13" fill="#f3f7f4" stroke="#27f0d0" stroke-width="3"/>
+  </g>
+  <g fill="none" stroke-linecap="round" stroke-width="2">
+    <path d="M356 198H184" stroke="#27f0d0"/>
+    <path d="M416 154h92l42-46h104" stroke="#ffc84a"/>
+    <path d="M430 242h78l42 52h104" stroke="#84ff64"/>
+  </g>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="800">
+    <g>
+      <rect x="82" y="172" width="164" height="48" rx="12" fill="#081018" stroke="#27f0d0" stroke-opacity=".56"/>
+      <text x="102" y="192" fill="#dffdf9" font-size="12">Favorite color</text>
+      <text x="102" y="210" fill="#ffc84a" font-size="11">ocean blue</text>
+    </g>
+    <g>
+      <rect x="548" y="82" width="144" height="48" rx="12" fill="#081018" stroke="#ffc84a" stroke-opacity=".56"/>
+      <text x="568" y="102" fill="#dffdf9" font-size="12">Dream trip</text>
+      <text x="568" y="120" fill="#ffc84a" font-size="11">aquarium rail</text>
+    </g>
+    <g>
+      <rect x="548" y="270" width="144" height="48" rx="12" fill="#081018" stroke="#84ff64" stroke-opacity=".5"/>
+      <text x="568" y="290" fill="#dffdf9" font-size="12">Best snack</text>
+      <text x="568" y="308" fill="#ffc84a" font-size="11">fruit yogurt</text>
+    </g>
+  </g>
+</svg>
