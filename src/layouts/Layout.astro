@@ -8,7 +8,12 @@
 		<title>TT Vlog</title>
 		<script is:inline>
 			(() => {
-				const storedTheme = localStorage.getItem('theme');
+				let storedTheme;
+				try {
+					storedTheme = localStorage.getItem('theme');
+				} catch {
+					// Storage can be unavailable; fall back to the system preference.
+				}
 				const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 				const theme = storedTheme === 'dark' || storedTheme === 'light'
 					? storedTheme

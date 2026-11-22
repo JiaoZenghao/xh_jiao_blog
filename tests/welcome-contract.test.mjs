@@ -27,7 +27,7 @@ test('animation controls are scoped per automatic scene and exclude scroll-owned
   assert.ok(motion.includes("driver === 'auto' && <div class=\"motion-controls\""), 'scroll scenes must not render automatic playback controls');
   assert.ok(motion.includes("scene.querySelector<HTMLButtonElement>('[data-motion-pause]')"));
   assert.ok(motion.includes("scene.querySelector<HTMLButtonElement>('[data-motion-replay]')"));
-  assert.ok(motion.includes("pauseButton.setAttribute('aria-pressed'"));
+  assert.ok(!motion.includes('aria-pressed'), 'action labels communicate playback without a contradictory toggle state');
 });
 
 test('playback respects reduced motion, manual pause and visibility', () => {

@@ -154,8 +154,12 @@ const hobbies = [
   themeToggle?.addEventListener('click', () => {
     const nextTheme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
     document.documentElement.dataset.theme = nextTheme;
-    localStorage.setItem('theme', nextTheme);
     syncThemeToggle();
+    try {
+      localStorage.setItem('theme', nextTheme);
+    } catch {
+      // Keep theme switching usable when persistence is unavailable.
+    }
   });
 
   syncThemeToggle();
@@ -976,13 +980,16 @@ const hobbies = [
   h2 { font-size: 48px; line-height: 1.08; }
   .hero__lead, .section-copy p { font-size: 18px; font-weight: 400; line-height: 1.75; }
   .section-copy .eyebrow { font-size: 12px; font-weight: 700; color: var(--cyan); }
-  .hero__copy { animation: arrival 800ms both; }
-  .hero-visual { animation: arrival 1000ms 120ms both; }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__copy { animation: arrival 800ms both; }
+    .hero-visual { animation: arrival 1000ms 120ms both; }
+    .hero-visual::after { animation: scan 3s 600ms ease-in-out; }
+  }
   .hero-visual img { border: 0; border-radius: 8px; box-shadow: none; }
   .hero-visual::after {
     content: ''; position: absolute; top: 0; bottom: 30px; left: 0; width: 1px;
     background: var(--cyan); box-shadow: 0 0 18px var(--cyan); opacity: 0;
-    animation: scan 3s 600ms ease-in-out; pointer-events: none;
+    pointer-events: none;
   }
   .logo__mark, .cta, .profile-panel, .fact-card, .hobby__card { border-radius: 8px; }
   .site-header nav a { position: relative; }
@@ -1043,16 +1050,13 @@ const hobbies = [
   }
   @media (prefers-reduced-motion: reduce) {
     :global(html) { scroll-behavior: auto; }
-    .reveal { opacity: 1; transform: none; }
-    .hero__copy, .hero-visual, .hero-visual::after { animation: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .theme-toggle__thumb { transition: background 180ms ease; }
+    .cta { transition: border-color 180ms ease, background 180ms ease; }
+    .cta:hover, .cta:focus-visible { transform: none; }
+    .hobby__card { transition: border-color 180ms ease, box-shadow 180ms ease; }
+    .hobby__card:hover { transform: none; }
+    .hobby__dial::before, .site-header nav a::after { transition: none; }
     .hobby__card:hover .hobby__dial::before { transform: none; }
-    *,
-    *::before,
-    *::after {
-      animation-duration: 1ms !important;
-      animation-iteration-count: 1 !important;
-      scroll-behavior: auto !important;
-      transition-duration: 1ms !important;
-    }
   }
 </style>

@@ -36,7 +36,7 @@ const { compact = false, label = 'TT / EXPLORER', variant = 'orbit', driver = 'a
   </div>
   {driver === 'auto' && <div class="motion-controls">
     <span class="motion-label">{label}</span>
-    <button type="button" data-motion-pause aria-pressed="false">Pause animation</button>
+    <button type="button" data-motion-pause>Pause animation</button>
     <button type="button" data-motion-replay>Replay</button>
   </div>}
 </div>
@@ -90,7 +90,6 @@ const { compact = false, label = 'TT / EXPLORER', variant = 'orbit', driver = 'a
       const running = !paused && inView && !document.hidden;
       animations.forEach((animation) => running ? animation.resume() : animation.pause());
       pauseButton.textContent = paused ? 'Play animation' : 'Pause animation';
-      pauseButton.setAttribute('aria-pressed', String(paused));
       pauseButton.disabled = reducedMotion.matches;
       replayButton.disabled = reducedMotion.matches;
       if (reducedMotion.matches) {
