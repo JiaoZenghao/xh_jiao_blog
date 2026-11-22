@@ -4,6 +4,8 @@ An Astro homepage with TT’s latest field note, profile, and weekend hobbies.
 
 Edit the featured note in `src/components/Welcome.astro`. Keep it readable without JavaScript. The decorative hero radar is the only looping animation and stays still on narrow screens or when reduced motion is requested.
 
+The field-note photo is served locally in three WebP widths (`public/bernina-express-*.webp`). If you replace it, update the responsive sources, alt text, and footer attribution together.
+
 ## 🚀 Project Structure
 
 Inside of your Astro project, you'll see the following folders and files:

@@ -1,6 +1,8 @@
 ---
 import MotionScene from './MotionScene.astro';
 
+const fieldNotePhoto = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/bernina-express`;
+
 const navItems = [
   { label: 'Field note', href: '#field-note' },
   { label: 'Meet me', href: '#introduction' },
@@ -67,23 +69,29 @@ const hobbies = [
       </div>
     </section>
 
-    <section class="field-note section-band" id="field-note" aria-labelledby="field-note-title">
-      <div class="wrap field-note__layout">
-        <article class="section-copy">
-          <p class="eyebrow">Field note 01 · Dream trip</p>
-          <h2 id="field-note-title">Aquariums and mountain trains</h2>
-          <p>My dream trip has two things on the list: an aquarium and a train ride through the mountains. I’d take my camera along so I could keep photos of both.</p>
-        </article>
-        <svg class="field-note__art" viewBox="0 0 480 300" aria-hidden="true">
-          <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-            <path class="note-contour" d="M20 120 100 40l48 50 74-74 106 104M20 142h440M20 158h440M20 174h440M20 190h440M20 206h440M20 222h440M20 238h440M20 254h440M20 270h440"/>
-            <path class="note-rail" d="M34 116h106c84 0 88 118 170 118h136M34 124h106c82 0 86 118 170 118h136"/>
-            <path class="note-fish" d="M325 179q35-36 71 0-36 36-71 0Zm71 0 27-19v38l-27-19M348 176h1"/>
-            <circle class="note-station" cx="34" cy="120" r="8"/>
-            <circle class="note-station" cx="446" cy="238" r="8"/>
-          </g>
-        </svg>
-      </div>
+    <section class="field-note" id="field-note" aria-labelledby="field-note-title">
+      <article class="wrap">
+        <header class="field-note__header">
+          <div>
+            <p class="eyebrow">Field note 01 · Dream trip</p>
+            <h2 id="field-note-title">Aquariums and mountain trains</h2>
+          </div>
+          <p class="field-note__text">My dream trip has two stops: a train ride through the mountains and an afternoon at an aquarium. I’d bring my camera for both.</p>
+        </header>
+        <img
+          class="field-note__photo"
+          src={`${fieldNotePhoto}-1536.webp`}
+          srcset={`${fieldNotePhoto}-768.webp 768w, ${fieldNotePhoto}-1536.webp 1536w, ${fieldNotePhoto}-2304.webp 2304w`}
+          sizes="(min-width: 1440px) 1288px, 88vw"
+          width="1536"
+          height="948"
+          alt="A red Bernina Express train passing a frozen lake in the Swiss Alps"
+          data-source="stand-in"
+          data-subject="Bernina Express by Lago Bianco"
+          loading="lazy"
+          decoding="async"
+        />
+      </article>
     </section>
 
     <section class="intro section-band" id="introduction">
@@ -122,7 +130,10 @@ const hobbies = [
   <footer class="site-footer">
     <div class="wrap">
       <a href="#hero">Back to top <span aria-hidden="true">↑</span></a>
-      <span>TT Vlog</span>
+      <span class="photo-credit">
+        Photo: <a href="https://commons.wikimedia.org/wiki/File:RhB_ABe_8-12_with_Bernina_Express_at_Lago_Bianco.jpg">David Gubler</a>
+        · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> · resized
+      </span>
     </div>
   </footer>
 </div>
@@ -293,7 +304,7 @@ const hobbies = [
       linear-gradient(135deg, var(--ink), var(--panel));
     background-size: 36px 36px, 36px 36px, auto;
   }
-  .hero__layout, .field-note__layout, .intro__layout {
+  .hero__layout, .intro__layout {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: center;
@@ -323,12 +334,37 @@ const hobbies = [
     padding-block: clamp(64px, 11vh, 112px);
     border-top: 1px solid var(--line);
   }
-  .field-note { min-height: min(100svh, 900px); }
-  .field-note__art { display: block; width: 100%; }
-  .note-contour { stroke: var(--line); }
-  .note-rail { stroke: var(--cyan); }
-  .note-fish { stroke: var(--gold); }
-  .note-station { fill: var(--ink); stroke: var(--cyan); }
+  .field-note {
+    padding-block: clamp(44px, 5vw, 72px);
+    border-top: 1px solid var(--line);
+  }
+  .field-note__header {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    align-items: end;
+    gap: 20px clamp(28px, 5vw, 72px);
+    margin-bottom: clamp(24px, 3vw, 42px);
+  }
+  .field-note__header h2 {
+    max-width: 17ch;
+    font-size: clamp(34px, 4.7vw, 68px);
+    font-weight: 650;
+    text-wrap: balance;
+  }
+  .field-note__text {
+    max-width: 36ch;
+    color: var(--muted);
+    font-size: clamp(16px, 1.5vw, 20px);
+    line-height: 1.6;
+  }
+  .field-note__photo {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 12 / 5;
+    object-fit: cover;
+    object-position: 50% 48%;
+  }
   .intro { background: var(--panel); }
   .facts-grid { margin: 0; border-top: 1px solid var(--line); }
   .facts-grid > div {
@@ -365,13 +401,14 @@ const hobbies = [
   .site-footer .wrap {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     justify-content: space-between;
     gap: 16px;
     padding-block: 12px;
     color: var(--muted);
     font: 700 12px var(--mono);
   }
-  .site-footer a {
+  .site-footer .wrap > a {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -379,6 +416,8 @@ const hobbies = [
     color: var(--text);
     text-decoration: none;
   }
+  .photo-credit { line-height: 1.5; }
+  .photo-credit a { text-underline-offset: 3px; }
   @media (prefers-reduced-motion: no-preference) {
     .hero__copy { animation: arrival 800ms both; }
     .cta { transition: transform 150ms, border-color 150ms, background 150ms; }
@@ -397,11 +436,11 @@ const hobbies = [
     .logo__text { display: none; }
     nav { gap: 0; }
     nav a { padding-inline: 6px; font-size: 11px; }
-    .hero__layout, .field-note__layout, .intro__layout, .hobby__grid {
+    .hero__layout, .field-note__header, .intro__layout, .hobby__grid {
       grid-template-columns: minmax(0, 1fr);
     }
     .hero__cta { flex-direction: column; }
-    .field-note { min-height: auto; }
+    .field-note__photo { aspect-ratio: 3 / 2; }
   }
   @media (max-width: 360px) {
     nav a { padding-inline: 4px; }
