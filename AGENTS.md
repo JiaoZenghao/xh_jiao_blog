@@ -3,7 +3,7 @@
 Guidance for agents working in this Astro project.
 
 ## Project Snapshot
-- Framework: Astro (`astro@5.x`)
+- Framework: Astro (`astro@7.x`)
 - Package manager: `pnpm`
 - Site config: [astro.config.mjs](/Users/jiaozenghao/work/learn/tt_blog/xh_jiao_blog/astro.config.mjs)
 - Main page entry: [src/pages/index.astro](/Users/jiaozenghao/work/learn/tt_blog/xh_jiao_blog/src/pages/index.astro)
@@ -55,6 +55,14 @@ pnpm dev
   - `base: '/xh_jiao_blog'`
 - Preserve `base`-aware asset handling (do not hardcode root-relative paths that bypass Astro base handling).
 
+## AI-Assisted Astro Development
+- Use the project-configured `astro-docs` MCP server to check official Astro APIs and patterns before making framework-specific changes.
+- Check `package.json` and the installed version before applying documentation examples. This project uses Astro 7; current documentation may describe newer releases. Do not upgrade Astro or adopt newer-major features without a task requiring it.
+- If the MCP server is unavailable, consult https://docs.astro.build/ and verify version compatibility; report any unresolved uncertainty.
+- Use `pnpm astro add <integration>` for official integrations and `pnpm add <package>` for other dependencies instead of manually editing dependency entries.
+- Run `pnpm build` and relevant existing tests after code changes.
+- Project connections: `.codex/config.toml` for Codex and `.mcp.json` for Claude Code. See the README for activation and verification.
+
 ## When Unsure
 - Prefer Astro official patterns over custom build tooling.
 - Keep dependency footprint small.
@@ -64,19 +72,24 @@ pnpm dev
 <claude-mem-context>
 # Memory Context
 
-# [xh_jiao_blog] recent context, 2026-05-25 8:19pm GMT+8
+# [xh_jiao_blog] recent context, 2026-09-09 6:30am GMT+8
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 33 obs (10,940t read) | 146,284t work | 93% savings
+Stats: 48 obs (17,104t read) | 594,380t work | 97% savings
 
+### May 13, 2026
+72 11:50a 🔵 xh_jiao_blog Tech Stack: Astro 5 + Three.js via CDN
+S5 User greeted with "hi" - session just started (May 13 at 11:50 AM)
+S4 Tech stack review of xh_jiao_blog project (May 13 at 11:50 AM)
+S8 Redesign Welcome.astro to match Remix.run website style, especially the animation section (May 13 at 11:58 AM)
 ### May 24, 2026
 73 11:48a 🔵 Astro Blog Project Structure Identified
 74 " 🔵 Welcome.astro Contains Existing Three.js 3D Globe Animation
+S12 Cross-platform CLI tool architecture design (Go + cobra + GoReleaser) — plan finalized, awaiting scaffold inputs (May 24 at 11:48 AM)
 S7 Redesign Welcome.astro to match Remix.run website style, especially the animation section (May 24 at 11:48 AM)
-S8 Redesign Welcome.astro to match Remix.run website style, especially the animation section (May 24 at 11:48 AM)
 75 11:49a 🔵 Welcome.astro Full CSS Architecture Documented
 76 11:56a 🔵 Three.js loaded via CDN, not installed locally in xh_jiao_blog
 77 11:57a 🔵 npm registry unreachable and pnpm store mismatch block local Three.js install
@@ -108,6 +121,33 @@ S8 Redesign Welcome.astro to match Remix.run website style, especially the anima
 103 12:20p 🟣 TT Vlog Welcome Page Built with Three.js WebGL Background
 104 " 🔵 Playwright Not Installed in xh_jiao_blog Project
 105 " 🟣 Flash-Free Theme Detection Script Added to Layout.astro
+### Jun 5, 2026
+141 4:04p 🔵 Security Scan Initiated via gstack CSO Skill on xh_jiao_blog
+142 " 🔵 xh_jiao_blog Project Structure: Minimal Astro Static Site
+143 " 🔵 Security Scan Found localStorage Usage; No Secrets or Critical Vulnerabilities in Source
+144 " 🔵 CI/CD Workflow Uses Version-Tagged Actions, Not SHA-Pinned; No CODEOWNERS or .gitleaks.toml
+145 " 🔵 Git History Clean: No Leaked Secrets or Credentials Found
+146 " 🔵 Welcome.astro Component: Pure Static Content, No User Input or Server-Side Logic
+147 4:05p 🔵 pnpm Audit Skipped: No Network Access to npmjs.org Registry
+148 4:17p 🚨 pnpm Audit Found 22 Vulnerabilities in astro@5.17.2 Dependency Tree
+149 4:19p 🔵 Astro v5.18.2 Available as In-Range Patch; v6.1.10 Fixes Most Transitive CVEs
+150 " 🔵 Install Scripts Found in esbuild and sharp Transitive Dependencies — Expected Legitimate Behavior
+151 " ✅ First Security Report Directory Created at .gstack/security-reports
+152 4:20p ✅ Security Audit Report Saved to .gstack/security-reports/2026-06-05-161901.json
+### Jun 13, 2026
+205 6:20p ⚖️ Cross-Platform CLI Tool Architecture Design
+206 6:24p ⚖️ Cross-Platform CLI Design Plan: Go + cobra + GoReleaser
+S10 Design a cross-platform CLI tool (Windows/macOS/Linux) with GitHub + GitHub Actions CI/CD — tech stack and project structure (Jun 13 at 6:25 PM)
+S11 Design a cross-platform CLI tool (Windows/macOS/Linux) with Go + GitHub Actions CI/CD — architecture plan created and approved (Jun 13 at 6:25 PM)
+S13 Cross-platform CLI tool architecture design (Go + cobra + GoReleaser) — design phase complete, session paused awaiting scaffold inputs (Jun 13 at 6:25 PM)
+**Investigated**: User requirements: single codebase compiling to Windows/macOS/Linux native binaries, GitHub VCS, GitHub Actions CI/CD, multi-subcommand tool (git/docker/kubectl style), distributed via GitHub Releases pre-built binaries.
 
-Access 146k tokens of past work via get_observations([IDs]) or mem-search skill.
+**Learned**: Go 1.22+ with cobra + GoReleaser is the canonical stack for this use case. GoReleaser eliminates hand-written build matrices. Standard cmd/+internal/ layout enforces thin main.go and testable commands. Version/Commit/Date injected via ldflags at compile time. Release workflow only needs built-in GITHUB_TOKEN. GoReleaser requires fetch-depth: 0 to access full tag history for changelog generation.
+
+**Completed**: Architecture plan saved to /Users/jiaozenghao/.claude/plans/windows-macos-linux-cli-generic-blanket.md. Covers: tech stack with rationale table, full project directory structure with per-file annotations, key file skeletons (main.go/root.go/version.go), ci.yml and release.yml workflow specifications, .goreleaser.yaml configuration, end-to-end release flow, 5-step verification checklist, and explicit YAGNI list (Homebrew/Scoop/Docker/viper/pkg all deferred).
+
+**Next Steps**: Waiting on user to provide three inputs before project scaffolding begins: (1) tool name, (2) local creation path, (3) GitHub username/org for Go module path.
+
+
+Access 594k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>

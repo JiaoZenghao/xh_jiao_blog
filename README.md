@@ -45,6 +45,27 @@ All commands are run from the root of the project, from a terminal:
 | `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `pnpm astro -- --help` | Get help using the Astro CLI                     |
 
+## AI coding tools
+
+This repository follows [Astro's AI tools guide](https://docs.astro.build/en/guides/build-with-ai/)
+and connects to the official Astro Docs MCP server over Streamable HTTP.
+No API key, local proxy, or additional npm dependency is required.
+
+| Tool | Project configuration | Activation |
+| --- | --- | --- |
+| Codex | `.codex/config.toml` | Start a new session from this repository and trust the project if prompted. Run `codex mcp get astro-docs` to inspect the loaded connection; use `/mcp` in the CLI to check available tools. |
+| Claude Code | `.mcp.json` | Start Claude Code from this repository and approve the project MCP server if prompted. Use `/mcp` to check its connection. |
+
+Try: “Use astro-docs to explain how to reference public assets with this project's base path in Astro 7.”
+The endpoint is `https://mcp.docs.astro.build/mcp`; internet access is required.
+If connection fails, restart the AI tool and check its project trust/MCP settings.
+For tools other than Codex and Claude Code, follow the tool-specific setup in the linked guide.
+
+The installed project uses Astro 7.4.13 and requires Node.js 22.23.4 or later
+(CI uses Node.js 24). Check documentation examples against the installed version.
+The Astro configuration explicitly preserves pre-v7 HTML whitespace handling.
+Project coding rules live in `AGENTS.md` and `CLAUDE.md`.
+
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).

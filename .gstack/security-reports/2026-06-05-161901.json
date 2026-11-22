@@ -1,0 +1,90 @@
+{
+  "version": "2.0.0",
+  "date": "2026-06-05T16:19:01+08:00",
+  "mode": "daily",
+  "scope": "full",
+  "diff_mode": false,
+  "phases_run": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+  "attack_surface": {
+    "code": {
+      "public_endpoints": 1,
+      "authenticated": 0,
+      "admin": 0,
+      "api": 0,
+      "uploads": 0,
+      "integrations": 1,
+      "background_jobs": 0,
+      "websockets": 0
+    },
+    "infrastructure": {
+      "ci_workflows": 1,
+      "webhook_receivers": 0,
+      "container_configs": 0,
+      "iac_configs": 0,
+      "deploy_targets": 1,
+      "secret_management": "GitHub OIDC; no application secrets found"
+    }
+  },
+  "findings": [
+    {
+      "id": 1,
+      "severity": "HIGH",
+      "confidence": 9,
+      "status": "VERIFIED",
+      "phase": 4,
+      "category": "CI/CD",
+      "title": "Mutable GitHub Action tags execute with deployment permissions",
+      "file": ".github/workflows/astro.yml",
+      "line": 12,
+      "fingerprint": "26718d300bcbcf80ffd7d67929296306ab428439eccb76c87a32b103ebff5a4b",
+      "description": "Workflow-level pages:write and id-token:write permissions are granted to the build job, where actions/checkout@v5, pnpm/action-setup@v6, actions/setup-node@v5, and actions/upload-pages-artifact@v4 are referenced by mutable tags rather than immutable commit SHAs.",
+      "exploit_scenario": "An upstream action repository or maintainer account is compromised and a referenced major-version tag is moved to malicious code. The next push to main runs that code in the build job with Pages write and OIDC token permissions, allowing deployment tampering or cloud-token abuse where an OIDC trust relationship accepts the repository.",
+      "impact": "Compromise of the published GitHub Pages artifact and misuse of any external trust configured for GitHub OIDC.",
+      "recommendation": "Pin every action to a reviewed full commit SHA. Move permissions to job scope: give build only contents:read, and give deploy pages:write plus id-token:write."
+    }
+  ],
+  "dependency_audit": {
+    "command": "pnpm audit --prod --json",
+    "summary": {
+      "total": 22,
+      "critical": 0,
+      "high": 7,
+      "moderate": 10,
+      "low": 5
+    },
+    "direct_dependency": "astro@5.17.2",
+    "latest_astro_5": "5.18.2",
+    "latest_astro": "6.4.4",
+    "reachability": {
+      "vite_arbitrary_file_read": "Not reachable in checked configuration: requires a network-exposed dev server; project scripts do not use --host.",
+      "astro_define_vars_xss": "Not reachable in checked source: define:vars is not used.",
+      "rollup_arbitrary_file_write": "No attacker-controlled Rollup names, output configuration, or plugins were found.",
+      "server_only_h3_advisories": "The production target is static GitHub Pages and contains no h3 server routes.",
+      "remaining_parser_and_glob_advisories": "Present in the build toolchain but no untrusted build inputs were identified."
+    },
+    "recommendation": "Update Astro and regenerate the lockfile, then rerun pnpm audit. Astro 5.18.2 permits patched transitive releases under its semver ranges, while fully patching the direct define:vars advisory requires Astro 6.1.6 or newer."
+  },
+  "checks": {
+    "secrets_current_tree": "PASS",
+    "secrets_git_history": "PASS",
+    "tracked_env_files": "PASS",
+    "dynamic_html_sinks": "PASS",
+    "command_execution_sinks": "PASS",
+    "server_routes_and_webhooks": "PASS",
+    "llm_security_surface": "NOT_APPLICABLE",
+    "repo_local_skill_supply_chain": "NOT_PRESENT",
+    "lockfile_tracked": "PASS",
+    "dependency_install_scripts": "Expected native build scripts found in esbuild and sharp only",
+    "secret_scanner_config": "No .gitleaks.toml or .secretlintrc present"
+  },
+  "filter_stats": {
+    "candidates": 25,
+    "filtered_or_downgraded": 24,
+    "reported": 1
+  },
+  "notes": [
+    "The application is a static single-page Astro site with no authentication, database, API routes, uploads, webhooks, or server runtime.",
+    "The Google Fonts CSS import is an outbound browser dependency and privacy consideration, but no concrete security exploit was identified.",
+    "Public content states that the subject is age 11. Review child privacy and publication consent separately from this technical vulnerability scan."
+  ]
+}

@@ -12,9 +12,16 @@ pnpm install    # Install dependencies
 
 Always run `pnpm build` before finishing a task to confirm there are no build errors.
 
+## AI Documentation Tools
+
+The project-level `.mcp.json` configures the official `astro-docs` MCP server.
+Consult it for Astro-specific APIs and follow the AI-Assisted Astro Development
+rules in `AGENTS.md`, including checking examples against this project's Astro 7
+version. See the README for connection setup and verification.
+
 ## Architecture
 
-Single-page personal blog/vlog built with **Astro 5.x** and deployed to GitHub Pages.
+Single-page personal blog/vlog built with **Astro 7.x** and deployed to GitHub Pages.
 
 - `src/pages/index.astro` — sole page; imports the Welcome component
 - `src/layouts/Layout.astro` — base HTML shell used by all pages
