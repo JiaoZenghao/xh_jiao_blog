@@ -116,7 +116,14 @@ const hobbies = [
 
     <section class="hobby section-band" id="hobby">
       <div class="wrap">
-        <h2>Weekend hobbies</h2>
+        <header class="hobby__heading">
+          <h2>Weekend hobbies</h2>
+          <svg class="hobby__dial" viewBox="0 0 100 54" aria-hidden="true" fill="none" stroke-width="2" stroke-linecap="round">
+            <path d="M8 47a42 42 0 0 1 84 0M16 28l5 3M50 15v6M84 28l-5 3"/>
+            <path class="hobby__needle" d="M50 47V18"/>
+            <circle cx="50" cy="47" r="3"/>
+          </svg>
+        </header>
         <div class="hobby__grid">
           {hobbies.map((item, index) => (
             <article class="hobby__card">
@@ -385,7 +392,13 @@ const hobbies = [
     object-position: 50% 48%;
   }
   .intro { background: var(--panel); }
-  .facts-grid { margin: 0; border-top: 1px solid var(--line); }
+  .facts-grid {
+    position: relative;
+    margin: 0;
+    padding-inline-start: 16px;
+    border-block-start: 1px solid var(--line);
+    border-inline-start: 1px solid var(--line);
+  }
   .facts-grid > div {
     display: flex;
     flex-wrap: wrap;
@@ -397,6 +410,22 @@ const hobbies = [
   }
   dt { color: var(--muted); font: 700 12px var(--mono); }
   dd { margin: 0; font-size: clamp(18px, 2vw, 26px); font-weight: 600; }
+  .hobby__heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .hobby__dial {
+    flex: none;
+    width: clamp(54px, 10vw, 108px);
+    stroke: var(--muted);
+  }
+  .hobby__needle {
+    stroke: var(--gold);
+    transform-origin: 50px 47px;
+    transform: rotate(62deg);
+  }
   .hobby__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -477,6 +506,33 @@ const hobbies = [
       }
       .field-note__accent { animation-range: entry 20% entry 48%; }
       .field-note__accent + .field-note__accent { animation-range: entry 40% entry 68%; }
+
+      .intro { view-timeline: --profile-entry block 16% 8%; }
+      .facts-grid::before {
+        content: '';
+        position: absolute;
+        inset-block: 0;
+        inset-inline-start: -1px;
+        width: 2px;
+        background: var(--cyan);
+        transform-origin: top;
+        animation: profile-scan 1ms linear both;
+        animation-timeline: --profile-entry;
+        animation-range: entry 12% entry 85%;
+      }
+      .facts-grid dt {
+        animation: profile-label 1ms linear both;
+        animation-timeline: --profile-entry;
+        animation-range: entry 18% entry 45%;
+      }
+      .facts-grid div + div dt { animation-range: entry 53% entry 80%; }
+
+      .hobby { view-timeline: --hobby-entry block 16% 8%; }
+      .hobby__needle {
+        animation: hobby-sweep 1ms linear both;
+        animation-timeline: --hobby-entry;
+        animation-range: entry 5% entry 75%;
+      }
     }
   }
   @keyframes arrival {
@@ -494,6 +550,18 @@ const hobbies = [
   @keyframes note-accent {
     from { color: var(--text); }
     to { color: var(--cyan); }
+  }
+  @keyframes profile-scan {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+  }
+  @keyframes profile-label {
+    from { color: var(--muted); }
+    to { color: var(--cyan); }
+  }
+  @keyframes hobby-sweep {
+    from { transform: rotate(-62deg); }
+    to { transform: rotate(62deg); }
   }
   @media (max-width: 700px) {
     .vlog-page { --header-height: 68px; }

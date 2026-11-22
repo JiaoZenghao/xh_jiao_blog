@@ -8,7 +8,7 @@ The field-note photo is served locally in three WebP widths (`public/bernina-exp
 
 The hero references React Bits’ [Split Text](https://reactbits.dev/text-animations/split-text) and [Dot Grid](https://reactbits.dev/backgrounds/dot-grid). The field-note headline adapts [Scroll Reveal](https://reactbits.dev/text-animations/scroll-reveal) as sequential color changes. These are native CSS interpretations, not React components.
 
-The field note uses a CSS view timeline for its headline accent and photo rule. The copy and photo stay visible without timeline support, and `prefers-reduced-motion` disables the entrance and scroll effects.
+CSS view timelines drive the field-note headline and photo rule, the profile fact scan, and the hobbies dial. The content stays visible without timeline support, and `prefers-reduced-motion` disables the entrance and scroll effects.
 
 ## 🚀 Project Structure
 
