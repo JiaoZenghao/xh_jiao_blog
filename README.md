@@ -1,10 +1,8 @@
-# Astro Starter Kit: Basics
+# TT Vlog
 
-```sh
-pnpm create astro@latest -- --template basics
-```
+An Astro homepage with TT’s latest field note, profile, and weekend hobbies.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Edit the featured note in `src/components/Welcome.astro`. Keep it readable without JavaScript. The decorative hero radar is the only looping animation and stays still on narrow screens or when reduced motion is requested.
 
 ## 🚀 Project Structure
 

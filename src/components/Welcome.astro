@@ -1,43 +1,35 @@
 ---
 import MotionScene from './MotionScene.astro';
-import ScrollStage from './ScrollStage.astro';
 
 const navItems = [
+  { label: 'Field note', href: '#field-note' },
   { label: 'Meet me', href: '#introduction' },
   { label: 'Hobbies', href: '#hobby' },
-  { label: 'Home', href: '#hero' },
 ];
 
 const facts = [
-  { label: 'Favorite color', value: 'Ocean blue', tone: 'cyan' },
-  { label: 'Dream trip', value: 'Aquariums + mountain trains', tone: 'gold' },
-  { label: 'Best snack', value: 'Fruit yogurt + crackers', tone: 'green' },
+  { label: 'Favorite color', value: 'Ocean blue' },
+  { label: 'Best snack', value: 'Fruit yogurt + crackers' },
 ];
 
 const hobbies = [
   {
-    title: 'Sports + Outdoors',
+    title: 'Sports and outdoors',
     detail: 'Basketball, swimming, beach walks, and weekend bike rides.',
-    metric: 'Move',
-    status: 'active',
   },
   {
-    title: 'Games + Building',
+    title: 'Games and building',
     detail: 'LEGO builds, Minecraft creative mode, and puzzle challenges.',
-    metric: 'Build',
-    status: 'creative',
   },
   {
-    title: 'Curious Stuff',
-    detail: 'Space facts, kid science videos, and fun experiments at home.',
-    metric: 'Learn',
-    status: 'scanning',
+    title: 'Space and science',
+    detail: 'Space facts, science videos, and experiments at home.',
   },
 ];
 ---
 
-<main class="vlog-page">
-  <div class="reading-progress" aria-hidden="true"></div>
+<div class="vlog-page">
+  <a class="skip-link" href="#content">Skip to content</a>
   <header class="site-header">
     <a class="logo" href="#hero" aria-label="TT Vlog home">
       <span class="logo__mark">TT</span>
@@ -48,112 +40,104 @@ const hobbies = [
         <a href={item.href}>{item.label}</a>
       ))}
     </nav>
-    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to light theme" aria-pressed="false">
-      <span class="theme-toggle__track" aria-hidden="true">
-        <span class="theme-toggle__thumb"></span>
-      </span>
-      <span class="theme-toggle__text" data-theme-label>Dark</span>
+    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Light theme" aria-pressed="false">
+      <svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>
+      </svg>
+      <svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20.9 13.35A9 9 0 0 1 10.65 3.1a9 9 0 1 0 10.25 10.25Z"/>
+      </svg>
     </button>
   </header>
 
-  <section class="hero" id="hero">
-    <div class="hero__copy">
-      <p class="eyebrow">Personal vlog · Mission log · Age 11</p>
-      <h1>TT Vlog<span>Small adventures.<br />Big discoveries.</span></h1>
-      <p class="hero__lead">
-        A small digital base for travel notes, school wins, hobbies, and the cool
-        things I learn every week.
-      </p>
-      <div class="hero__cta" aria-label="Page shortcuts">
-        <a class="cta cta--primary" href="#introduction">Open profile</a>
-        <a class="cta" href="#hobby">Explore hobbies <span aria-hidden="true">↗</span></a>
-      </div>
-    </div>
-
-    <div class="hero-motion"><MotionScene /></div>
-  </section>
-
-  <ScrollStage />
-
-  <section class="intro section-band" id="introduction">
-    <div class="section-copy">
-      <p class="eyebrow">Profile scan</p>
-      <h2>Introduction</h2>
-      <p>
-        I am an 11-year-old boy who loves to explore new places, try new food,
-        and learn cool facts. I like writing short stories about my day and
-        keeping photos of special moments.
-      </p>
-      <p>
-        In this vlog, you will find travel notes, school highlights, and little
-        tips I discover while growing up. Thanks for stopping by!
-      </p>
-    </div>
-
-    <div class="profile-panel">
-      <div class="panel-topline">
-        <span>PROFILE-ID TT-011</span>
-        <span>SYNCED</span>
-      </div>
-      <MotionScene variant="signal" label="TT / PROFILE" />
-    </div>
-
-    <div class="facts-grid" aria-label="Quick facts">
-      {facts.map((fact) => (
-        <article class={`fact-card fact-card--${fact.tone}`}>
-          <span>{fact.label}</span>
-          <strong>{fact.value}</strong>
-        </article>
-      ))}
-    </div>
-  </section>
-
-  <section class="hobby section-band" id="hobby">
-    <header class="section-copy">
-      <p class="eyebrow">Weekend telemetry</p>
-      <h2>Off the clock.<br />Into the curious.</h2>
-      <p>These are the things that make my weekends feel awesome.</p>
-    </header>
-
-    <div class="hobby__grid">
-      {hobbies.map((item, index) => (
-        <article class="hobby__card">
-          <div class="hobby__dial" aria-hidden="true">
-            <span>{String(index + 1).padStart(2, '0')}</span>
+  <main id="content" tabindex="-1">
+    <section class="hero" id="hero">
+      <div class="wrap hero__layout">
+        <div class="hero__copy">
+          <p class="eyebrow">Personal vlog · Age 11</p>
+          <h1>TT Vlog</h1>
+          <p class="hero__lead">I’m TT. This is where I write about my hobbies, the places I’d like to go, and the things I learn along the way.</p>
+          <div class="hero__cta">
+            <a class="cta cta--primary" href="#field-note">Read the latest note <span aria-hidden="true">↓</span></a>
+            <a class="cta" href="#hobby">Explore hobbies</a>
           </div>
-          <div>
-            <p class="hobby__metric">{item.metric}</p>
-            <h3>{item.title}</h3>
-          </div>
-          <p>{item.detail}</p>
-          <footer>
-            <span>Status</span>
-            <strong>{item.status}</strong>
-          </footer>
+        </div>
+        <MotionScene />
+      </div>
+    </section>
+
+    <section class="field-note section-band" id="field-note" aria-labelledby="field-note-title">
+      <div class="wrap field-note__layout">
+        <article class="section-copy">
+          <p class="eyebrow">Field note 01 · Dream trip</p>
+          <h2 id="field-note-title">Aquariums and mountain trains</h2>
+          <p>My dream trip has two things on the list: an aquarium and a train ride through the mountains. I’d take my camera along so I could keep photos of both.</p>
         </article>
-      ))}
+        <svg class="field-note__art" viewBox="0 0 480 300" aria-hidden="true">
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            <path class="note-contour" d="M20 120 100 40l48 50 74-74 106 104M20 142h440M20 158h440M20 174h440M20 190h440M20 206h440M20 222h440M20 238h440M20 254h440M20 270h440"/>
+            <path class="note-rail" d="M34 116h106c84 0 88 118 170 118h136M34 124h106c82 0 86 118 170 118h136"/>
+            <path class="note-fish" d="M325 179q35-36 71 0-36 36-71 0Zm71 0 27-19v38l-27-19M348 176h1"/>
+            <circle class="note-station" cx="34" cy="120" r="8"/>
+            <circle class="note-station" cx="446" cy="238" r="8"/>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <section class="intro section-band" id="introduction">
+      <div class="wrap intro__layout">
+        <div class="section-copy">
+          <p class="eyebrow">Profile scan</p>
+          <h2>Meet TT</h2>
+          <p>I like exploring new places, trying new food, and learning cool facts. I write short stories about my day and keep photos of special moments.</p>
+        </div>
+        <dl class="facts-grid" aria-label="Quick facts">
+          {facts.map((fact) => (
+            <div>
+              <dt>{fact.label}</dt>
+              <dd>{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <section class="hobby section-band" id="hobby">
+      <div class="wrap">
+        <h2>Weekend hobbies</h2>
+        <div class="hobby__grid">
+          {hobbies.map((item, index) => (
+            <article class="hobby__card">
+              <span class="hobby__index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              <h3>{item.title}</h3>
+              <p>{item.detail}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap">
+      <a href="#hero">Back to top <span aria-hidden="true">↑</span></a>
+      <span>TT Vlog</span>
     </div>
-  </section>
-  <footer class="site-footer"><a href="#hero">TT Vlog <span aria-hidden="true">↑</span></a><span>Stay curious. Keep exploring.</span></footer>
-</main>
+  </footer>
+</div>
 
 <script>
-  import { animate } from 'animejs';
   const themeToggle = document.querySelector('[data-theme-toggle]');
-  const themeLabel = document.querySelector('[data-theme-label]');
+  const root = document.documentElement;
 
   const syncThemeToggle = () => {
-    const isLight = document.documentElement.dataset.theme === 'light';
-    themeToggle?.setAttribute('aria-pressed', String(isLight));
-    themeToggle?.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to light theme');
-    if (themeLabel) {
-      themeLabel.textContent = isLight ? 'Light' : 'Dark';
-    }
+    themeToggle?.setAttribute('aria-pressed', String(root.dataset.theme === 'light'));
   };
 
   themeToggle?.addEventListener('click', () => {
-    const nextTheme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
-    document.documentElement.dataset.theme = nextTheme;
+    const nextTheme = root.dataset.theme === 'light' ? 'dark' : 'light';
+    root.dataset.theme = nextTheme;
     syncThemeToggle();
     try {
       localStorage.setItem('theme', nextTheme);
@@ -163,900 +147,263 @@ const hobbies = [
   });
 
   syncThemeToggle();
-
-  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  // Seek paused animations from scroll position so upward scrolling reverses them.
-  const scrollItems = [...document.querySelectorAll<HTMLElement>('.section-copy, .profile-panel, .fact-card, .hobby__card, .site-footer')].map((element) => {
-    const isCard = element.matches('.fact-card, .hobby__card');
-    const index = isCard ? [...element.parentElement!.children].indexOf(element) : 0;
-    element.classList.add('scroll-linked');
-    return {
-      element,
-      top: 0,
-      delay: index * 0.055,
-      animation: animate(element, {
-        y: [isCard ? 90 : 48, 0],
-        opacity: [0.35, 1],
-        scale: [isCard ? 0.94 : 1, 1],
-        rotate: [isCard ? (index - 1) * 2 : 0, 0],
-        duration: 1000,
-        ease: 'outCubic',
-        autoplay: false,
-      }),
-    };
-  });
-  const sections = [...document.querySelectorAll<HTMLElement>('main > section')].map((element) => ({ element, top: 0, height: 0 }));
-  const heroMotion = document.querySelector<HTMLElement>('.hero-motion')!;
-  const heroParallax = animate(heroMotion, { y: [0, 100], rotate: [0, 18], scale: [1, 0.86], duration: 1000, ease: 'linear', autoplay: false });
-  const dials = [...document.querySelectorAll<HTMLElement>('.hobby__dial')].map((element) => ({
-    element,
-    animation: animate(element, { rotate: [-140, 0], duration: 1000, ease: 'outCubic', autoplay: false }),
-  }));
-  const clampProgress = (value: number) => Math.min(1, Math.max(0, value));
-  const documentTop = (element: HTMLElement) => {
-    let top = 0;
-    let current: HTMLElement | null = element;
-    while (current) { top += current.offsetTop; current = current.offsetParent as HTMLElement | null; }
-    return top;
-  };
-  const measure = () => {
-    scrollItems.forEach((item) => { item.top = documentTop(item.element); });
-    sections.forEach((item) => { item.top = documentTop(item.element); item.height = item.element.offsetHeight; });
-  };
-
-  const progress = document.querySelector<HTMLElement>('.reading-progress');
-  let scrollFrame = 0;
-  const updateProgress = () => {
-    const distance = document.documentElement.scrollHeight - window.innerHeight;
-    progress?.style.setProperty('--progress', String(distance > 0 ? window.scrollY / distance : 0));
-    const viewport = window.innerHeight;
-    scrollItems.forEach((item) => {
-      const start = item.top - viewport * (0.98 - item.delay);
-      const end = Math.min(start + viewport * 0.48, distance);
-      const position = (window.scrollY - start) / Math.max(1, end - start);
-      item.animation.seek((motion.matches ? 1 : clampProgress(position)) * 1000);
-    });
-    sections.forEach((item) => {
-      const position = clampProgress((window.scrollY + viewport - item.top) / (viewport + item.height));
-      item.element.style.setProperty('--section-progress', String(motion.matches ? 1 : position));
-      item.element.style.setProperty('--grid-shift', `${motion.matches ? 0 : position * 52}px`);
-    });
-    heroParallax.seek(motion.matches ? 0 : clampProgress(window.scrollY / Math.max(sections[0].height, 1)) * 1000);
-    dials.forEach((item) => {
-      const position = clampProgress((window.scrollY + viewport * 0.95 - documentTop(item.element)) / (viewport * 0.6));
-      item.animation.seek((motion.matches ? 1 : position) * 1000);
-    });
-    scrollFrame = 0;
-  };
-  window.addEventListener('scroll', () => {
-    if (!scrollFrame) scrollFrame = requestAnimationFrame(updateProgress);
-  }, { passive: true });
-  window.addEventListener('resize', () => { measure(); updateProgress(); });
-  motion.addEventListener('change', updateProgress);
-  // The stage can expand/collapse without a window resize (motion preference,
-  // short viewport, or static fallback). Its notification follows actual layout.
-  document.addEventListener('scroll-stage:layout', (event) => {
-    if (!(event.target instanceof HTMLElement) || !event.target.matches('[data-scroll-stage]')) return;
-    measure();
-    updateProgress();
-  });
-  window.addEventListener('load', () => { measure(); updateProgress(); }, { once: true });
-  measure();
-  updateProgress();
-
-  const navLinks = document.querySelectorAll<HTMLAnchorElement>('.site-header nav a');
-  const sectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      navLinks.forEach((link) => {
-        if (link.hash === `#${entry.target.id}`) link.setAttribute('aria-current', 'location');
-        else link.removeAttribute('aria-current');
-      });
-    });
-  }, { rootMargin: '-15% 0px -55% 0px' });
-  document.querySelectorAll('main > section').forEach((section) => sectionObserver.observe(section));
-
-  document.querySelectorAll<HTMLElement>('.hobby__card').forEach((card) => {
-    card.addEventListener('pointermove', (event) => {
-      if (motion.matches || event.pointerType !== 'mouse') return;
-      const rect = card.getBoundingClientRect();
-      card.style.setProperty('--pointer-x', `${event.clientX - rect.left}px`);
-      card.style.setProperty('--pointer-y', `${event.clientY - rect.top}px`);
-    });
-  });
 </script>
 
 <style>
-  :global(html) {
-    background: #070b10;
-    scroll-behavior: smooth;
-  }
-
-  :global(body) {
-    margin: 0;
-    overflow-x: hidden;
-    background: #070b10;
-    color: #f3f7f4;
-  }
-
-  :global(*) {
-    box-sizing: border-box;
-  }
+  :global(*) { box-sizing: border-box; }
 
   .vlog-page {
     --ink: #070b10;
     --panel: #101923;
-    --panel-strong: #142433;
     --text: #f3f7f4;
-    --muted: #9fb3b3;
+    --muted: #a8baba;
     --cyan: #27f0d0;
-    --blue: #4d8dff;
     --gold: #ffc84a;
-    --green: #84ff64;
     --coral: #ff6262;
-    --line: rgba(132, 255, 228, 0.22);
-    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
-    min-height: 100vh;
-    background:
-      linear-gradient(rgba(39, 240, 208, 0.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(39, 240, 208, 0.045) 1px, transparent 1px),
-      linear-gradient(135deg, #070b10 0%, #101923 48%, #1d1717 100%);
-    background-size: 36px 36px, 36px 36px, auto;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --line: #304744;
+    --grid: rgba(39, 240, 208, 0.045);
+    --button-ink: #06110f;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --gutter: clamp(20px, 6vw, 76px);
+    --measure: 1288px;
+    --header-height: 80px;
+    background: var(--ink);
+    color: var(--text);
+    font-family: system-ui, sans-serif;
   }
-
-  :global(html[data-theme='light']) {
-    background: #edf7f8;
-  }
-
-  :global(html[data-theme='light'] body) {
-    background: #edf7f8;
-    color: #102330;
-  }
-
   :global(html[data-theme='light']) .vlog-page {
-    --ink: #edf7f8;
-    --panel: #ffffff;
-    --panel-strong: #dff1f3;
+    --ink: #f3fafb;
+    --panel: #e6f2f3;
     --text: #102330;
-    --muted: #526972;
-    --cyan: #008f82;
-    --blue: #245fc8;
-    --gold: #a36a00;
-    --green: #287a22;
+    --muted: #415d64;
+    --cyan: #006e63;
+    --gold: #8c5700;
     --coral: #c13c3c;
-    --line: rgba(0, 143, 130, 0.22);
-    background:
-      linear-gradient(rgba(0, 143, 130, 0.075) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 143, 130, 0.075) 1px, transparent 1px),
-      linear-gradient(135deg, #f6fbfc 0%, #e7f3f5 48%, #fff5ec 100%);
-    background-size: 36px 36px, 36px 36px, auto;
+    --line: #acc9c6;
+    --grid: rgba(0, 110, 99, 0.08);
+    --button-ink: #fff;
   }
-
-  .site-header {
-    position: fixed;
-    z-index: 20;
-    top: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 18px clamp(18px, 4vw, 42px);
-    background: rgba(7, 11, 16, 0.72);
-    border-bottom: 1px solid rgba(39, 240, 208, 0.16);
-    backdrop-filter: blur(16px);
+  .wrap {
+    width: min(calc(100% - 2 * var(--gutter)), var(--measure));
+    margin-inline: auto;
   }
-
-  :global(html[data-theme='light']) .site-header {
-    background: rgba(246, 251, 252, 0.78);
-    border-bottom-color: rgba(0, 143, 130, 0.2);
-  }
-
-  .logo,
-  .site-header nav a,
-  .cta,
-  .theme-toggle {
-    min-height: 44px;
-  }
-
-  .logo {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--text);
-    text-decoration: none;
-  }
-
-  .logo__mark {
-    display: inline-grid;
-    place-items: center;
-    width: 44px;
-    aspect-ratio: 1;
-    border: 1px solid rgba(39, 240, 208, 0.56);
-    border-radius: 12px;
-    color: var(--cyan);
-    background: rgba(39, 240, 208, 0.08);
-    font-family: var(--mono);
-    font-weight: 800;
-  }
-
-  .logo__text,
-  .site-header nav a,
-  .eyebrow,
-  .cta,
-  .panel-topline,
-  .fact-card span,
-  .hobby__metric,
-  .hobby__card footer {
-    font-family: var(--mono);
-  }
-
-  .logo__text {
-    font-size: 13px;
-    font-weight: 800;
-    text-transform: uppercase;
-  }
-
-  .site-header nav {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
-  }
-
-  .site-header nav a {
-    display: inline-flex;
-    align-items: center;
-    padding: 0 12px;
-    border: 1px solid transparent;
-    color: #c9d7d6;
-    font-size: 12px;
-    font-weight: 800;
-    text-decoration: none;
-  }
-
-  .site-header nav a:hover,
-  .site-header nav a:focus-visible {
-    color: var(--text);
-    border-color: rgba(39, 240, 208, 0.34);
-    outline: none;
-  }
-
-  .theme-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 12px;
-    border: 1px solid rgba(39, 240, 208, 0.34);
-    border-radius: 999px;
-    color: #c9d7d6;
-    background: rgba(16, 25, 35, 0.78);
-    cursor: pointer;
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 800;
-  }
-
-  .theme-toggle:focus-visible {
+  a { color: inherit; }
+  :is(a, button):focus-visible {
     outline: 2px solid var(--cyan);
     outline-offset: 3px;
   }
+  main, section { scroll-margin-top: var(--header-height); }
 
-  .theme-toggle__track {
+  .skip-link {
+    position: fixed;
+    z-index: 2;
+    top: 12px;
+    left: var(--gutter);
+    display: grid;
+    place-items: center;
+    min-height: 44px;
+    padding-inline: 16px;
+    border-radius: 8px;
+    background: var(--cyan);
+    color: var(--button-ink);
+  }
+  .skip-link:not(:focus) { clip-path: inset(50%); }
+  .site-header {
+    position: sticky;
+    z-index: 1;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: var(--header-height);
+    padding: 8px max(var(--gutter), calc((100% - var(--measure)) / 2));
+    border-bottom: 1px solid var(--line);
+    background: var(--ink);
+    font: 700 12px var(--mono);
+  }
+  .logo, nav a, .theme-toggle {
     display: inline-flex;
     align-items: center;
-    width: 40px;
-    height: 22px;
-    padding: 3px;
-    border-radius: 999px;
-    background: rgba(39, 240, 208, 0.18);
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    text-decoration: none;
   }
-
-  .theme-toggle__thumb {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--cyan);
-    box-shadow: 0 0 12px rgba(39, 240, 208, 0.7);
-    transition: transform 180ms ease, background 180ms ease;
-  }
-
-  .theme-toggle[aria-pressed='true'] .theme-toggle__thumb {
-    transform: translateX(18px);
-  }
-
-  :global(html[data-theme='light']) .site-header nav a,
-  :global(html[data-theme='light']) .theme-toggle {
-    color: #28444e;
-  }
-
-  :global(html[data-theme='light']) .theme-toggle {
-    background: rgba(255, 255, 255, 0.78);
-    border-color: rgba(0, 143, 130, 0.28);
-  }
-
-  :global(html[data-theme='light']) .theme-toggle__track {
-    background: rgba(0, 143, 130, 0.16);
-  }
-
-  .hero,
-  .section-band {
-    min-height: 100dvh;
-    position: relative;
-    overflow: hidden;
-    padding: clamp(92px, 9vw, 124px) clamp(20px, 6vw, 76px) clamp(64px, 8vw, 96px);
-  }
-
-  .hero {
+  .logo { gap: 10px; }
+  .logo__mark {
     display: grid;
-    grid-template-columns: minmax(260px, 0.9fr) minmax(360px, 1.1fr);
-    align-items: center;
-    gap: clamp(32px, 6vw, 72px);
-    min-height: 94dvh;
-  }
-
-  .hero::after,
-  .section-band::after {
-    content: '';
-    position: absolute;
-    left: clamp(20px, 6vw, 76px);
-    right: clamp(20px, 6vw, 76px);
-    bottom: 34px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(39, 240, 208, 0.7), transparent);
-  }
-
-  :global(html[data-theme='light']) .hero::after,
-  :global(html[data-theme='light']) .section-band::after {
-    background: linear-gradient(90deg, transparent, rgba(0, 143, 130, 0.5), transparent);
-  }
-
-  .hero__copy,
-  .section-copy,
-  .hero-visual,
-  .profile-panel,
-  .facts-grid,
-  .hobby__grid {
-    position: relative;
-    z-index: 1;
-  }
-
-  .eyebrow {
-    margin: 0 0 18px;
+    place-items: center;
+    width: 44px;
+    aspect-ratio: 1;
+    border: 1px solid var(--line);
+    border-radius: 8px;
     color: var(--cyan);
-    font-size: 12px;
-    font-weight: 800;
+    font-size: 16px;
+  }
+  .logo__text { text-transform: uppercase; }
+  nav { display: flex; gap: 8px; }
+  nav a { padding-inline: 12px; }
+  nav a:hover, .site-footer a:hover {
+    color: var(--cyan);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .theme-toggle {
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--panel);
+    color: var(--cyan);
+    cursor: pointer;
+  }
+  .theme-toggle:hover { border-color: var(--cyan); }
+  .theme-icon { width: 19px; height: 19px; }
+  .theme-icon--moon,
+  :global(html[data-theme='light']) .theme-icon--sun { display: none; }
+  :global(html[data-theme='light']) .theme-icon--moon { display: block; }
+
+  h1, h2, h3, p { margin: 0; }
+  h1, h2 { line-height: 1.04; letter-spacing: -0.055em; }
+  h1 { font-size: clamp(56px, 8vw, 112px); }
+  h2 { font-size: clamp(36px, 5.2vw, 72px); }
+  h3 { font-size: clamp(22px, 2.4vw, 30px); line-height: 1.15; letter-spacing: -0.035em; }
+  .hero__lead, .section-copy > p:not(.eyebrow) {
+    max-width: 46ch;
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: clamp(16px, 1.6vw, 20px);
+    line-height: 1.65;
+  }
+  .eyebrow {
+    margin-bottom: 16px;
+    color: var(--cyan);
+    font: 700 12px/1.5 var(--mono);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-
-  h1,
-  h2,
-  h3,
-  p {
-    margin-top: 0;
+  .hero {
+    display: grid;
+    align-items: center;
+    min-height: calc(100svh - var(--header-height));
+    padding-block: clamp(32px, 6vh, 72px);
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      linear-gradient(135deg, var(--ink), var(--panel));
+    background-size: 36px 36px, 36px 36px, auto;
   }
-
-  h1 {
-    max-width: 720px;
-    margin-bottom: 24px;
-    color: var(--text);
-    font-size: clamp(44px, 8vw, 96px);
-    line-height: 0.92;
-    letter-spacing: 0;
+  .hero__layout, .field-note__layout, .intro__layout {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: clamp(28px, 5vw, 84px);
   }
-
-  h2 {
-    max-width: 560px;
-    margin-bottom: 20px;
-    color: var(--text);
-    font-size: clamp(34px, 6vw, 72px);
-    line-height: 0.96;
-    letter-spacing: 0;
-  }
-
-  .hero__lead,
-  .section-copy p {
-    max-width: 560px;
-    color: #c9d7d6;
-    font-size: clamp(16px, 2vw, 20px);
-    font-weight: 650;
-    line-height: 1.55;
-  }
-
-  :global(html[data-theme='light']) .hero__lead,
-  :global(html[data-theme='light']) .section-copy p,
-  :global(html[data-theme='light']) .hobby__card p {
-    color: #38525c;
-  }
-
-  .hero__cta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 34px;
-  }
-
+  .hero__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
   .cta {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 18px;
-    border: 1px solid rgba(39, 240, 208, 0.38);
-    border-radius: 12px;
-    color: var(--text);
-    background: rgba(16, 25, 35, 0.78);
-    font-size: 12px;
-    font-weight: 800;
-    text-decoration: none;
-    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
-  }
-
-  :global(html[data-theme='light']) .cta {
-    color: #102330;
-    background: rgba(255, 255, 255, 0.78);
-    border-color: rgba(0, 143, 130, 0.24);
-  }
-
-  .cta:hover,
-  .cta:focus-visible {
-    transform: translateY(-2px);
-    border-color: rgba(39, 240, 208, 0.9);
-    outline: none;
-  }
-
-  .cta--primary {
-    color: #06110f;
-    background: linear-gradient(135deg, var(--cyan), var(--green));
-    border-color: transparent;
-  }
-
-  :global(html[data-theme='light']) .cta--primary {
-    color: #f7fffe;
-    background: linear-gradient(135deg, #008f82, #245fc8);
-  }
-
-  .hero-visual {
-    margin: 0;
-  }
-
-  .hero-visual img,
-  .profile-panel img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  .hero-visual img {
-    aspect-ratio: 9 / 7;
-    object-fit: cover;
-    border: 1px solid rgba(39, 240, 208, 0.36);
-    border-radius: 24px;
+    gap: 12px;
+    min-height: 48px;
+    padding-inline: 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
     background: var(--panel);
-    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+    font: 700 12px var(--mono);
+    text-decoration: none;
   }
+  .cta--primary { background: var(--cyan); border-color: var(--cyan); color: var(--button-ink); }
+  .cta:hover { border-color: var(--cyan); }
+  .cta--primary:hover { background: color-mix(in srgb, var(--cyan) 90%, var(--text)); }
 
-  :global(html[data-theme='light']) .hero-visual img,
-  :global(html[data-theme='light']) .profile-panel img {
-    filter: saturate(0.94) brightness(1.06);
-  }
-
-  :global(html[data-theme='light']) .hero-visual img {
-    box-shadow: 0 24px 60px rgba(28, 74, 90, 0.18);
-  }
-
-  .hero-visual figcaption {
-    margin-top: 14px;
-    color: var(--muted);
-    font-family: var(--mono);
-    font-size: 12px;
-    text-align: right;
-  }
-
-  .intro {
+  .section-band {
     display: grid;
-    grid-template-columns: minmax(260px, 0.72fr) minmax(360px, 1fr);
-    grid-template-rows: auto auto;
-    gap: clamp(24px, 4vw, 48px);
-    background:
-      linear-gradient(rgba(77, 141, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(77, 141, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(135deg, #0b1017, #121d28 52%, #171411);
-    background-size: 30px 30px, 30px 30px, auto;
+    align-items: center;
+    padding-block: clamp(64px, 11vh, 112px);
+    border-top: 1px solid var(--line);
   }
-
-  :global(html[data-theme='light']) .intro {
-    background:
-      linear-gradient(rgba(36, 95, 200, 0.075) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(36, 95, 200, 0.075) 1px, transparent 1px),
-      linear-gradient(135deg, #f8fcfd, #e9f5f7 52%, #fff7ec);
-    background-size: 30px 30px, 30px 30px, auto;
-  }
-
-  .profile-panel {
-    align-self: center;
-    border: 1px solid rgba(39, 240, 208, 0.3);
-    border-radius: 24px;
-    padding: 14px;
-    background: rgba(8, 15, 20, 0.58);
-    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
-  }
-
-  :global(html[data-theme='light']) .profile-panel {
-    background: rgba(255, 255, 255, 0.7);
-    border-color: rgba(0, 143, 130, 0.24);
-    box-shadow: 0 22px 50px rgba(28, 74, 90, 0.16);
-  }
-
-  .panel-topline {
+  .field-note { min-height: min(100svh, 900px); }
+  .field-note__art { display: block; width: 100%; }
+  .note-contour { stroke: var(--line); }
+  .note-rail { stroke: var(--cyan); }
+  .note-fish { stroke: var(--gold); }
+  .note-station { fill: var(--ink); stroke: var(--cyan); }
+  .intro { background: var(--panel); }
+  .facts-grid { margin: 0; border-top: 1px solid var(--line); }
+  .facts-grid > div {
     display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
     justify-content: space-between;
-    gap: 14px;
-    padding: 4px 6px 14px;
-    color: var(--muted);
-    font-size: 11px;
-    font-weight: 800;
+    gap: 8px 16px;
+    padding-block: 20px;
+    border-bottom: 1px solid var(--line);
   }
-
-  .facts-grid {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-  }
-
-  .fact-card,
-  .hobby__card {
-    border: 1px solid rgba(39, 240, 208, 0.28);
-    border-radius: 18px;
-    background:
-      linear-gradient(90deg, transparent 0 92%, rgba(39, 240, 208, 0.07) 92%),
-      linear-gradient(180deg, rgba(16, 25, 35, 0.92), rgba(11, 16, 23, 0.78));
-    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.24);
-  }
-
-  :global(html[data-theme='light']) .fact-card,
-  :global(html[data-theme='light']) .hobby__card {
-    border-color: rgba(0, 143, 130, 0.22);
-    background:
-      linear-gradient(90deg, transparent 0 92%, rgba(0, 143, 130, 0.065) 92%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(230, 244, 247, 0.78));
-    box-shadow: 0 18px 34px rgba(28, 74, 90, 0.14);
-  }
-
-  .fact-card {
-    min-height: 132px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-  .fact-card span {
-    color: var(--muted);
-    font-size: 12px;
-    font-weight: 800;
-  }
-
-  .fact-card strong {
-    color: var(--text);
-    font-size: clamp(20px, 3vw, 30px);
-    line-height: 1.1;
-  }
-
-  .fact-card--gold {
-    border-color: rgba(255, 200, 74, 0.35);
-  }
-
-  .fact-card--green {
-    border-color: rgba(132, 255, 100, 0.3);
-  }
-
-  .hobby {
-    display: grid;
-    align-content: center;
-    gap: clamp(28px, 5vw, 54px);
-    background:
-      linear-gradient(rgba(39, 240, 208, 0.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(39, 240, 208, 0.045) 1px, transparent 1px),
-      linear-gradient(145deg, #070b10, #111c27 46%, #201618);
-    background-size: 34px 34px, 34px 34px, auto;
-  }
-
-  :global(html[data-theme='light']) .hobby {
-    background:
-      linear-gradient(rgba(0, 143, 130, 0.07) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 143, 130, 0.07) 1px, transparent 1px),
-      linear-gradient(145deg, #f7fbfc, #e7f4f6 48%, #fff4f0);
-    background-size: 34px 34px, 34px 34px, auto;
-  }
-
+  dt { color: var(--muted); font: 700 12px var(--mono); }
+  dd { margin: 0; font-size: clamp(18px, 2vw, 26px); font-weight: 600; }
   .hobby__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
+    gap: 16px;
+    margin-top: 32px;
   }
-
   .hobby__card {
-    min-height: 318px;
-    padding: 22px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
-    position: relative;
-    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    padding: clamp(20px, 3vw, 32px);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
   }
-
-  .hobby__card::after {
-    content: '';
-    position: absolute;
-    left: 22px;
-    right: 22px;
-    top: 96px;
-    height: 1px;
-    background: linear-gradient(90deg, rgba(39, 240, 208, 0.72), transparent);
-  }
-
-  .hobby__card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(39, 240, 208, 0.78);
-    box-shadow: 0 24px 46px rgba(0, 0, 0, 0.32), 0 0 28px rgba(39, 240, 208, 0.1);
-  }
-
-  .hobby__dial {
-    display: grid;
-    place-items: center;
-    width: 64px;
-    aspect-ratio: 1;
-    border: 1px solid rgba(39, 240, 208, 0.44);
-    border-radius: 50%;
-    background: conic-gradient(from 120deg, var(--cyan), transparent 28%, var(--gold), transparent 72%, var(--blue));
-  }
-
-  .hobby__dial span {
-    display: grid;
-    place-items: center;
-    width: 42px;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    color: var(--text);
-    background: #0a1118;
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 900;
-  }
-
-  :global(html[data-theme='light']) .hobby__dial span {
-    color: #f7fffe;
-    background: #102330;
-  }
-
-  .hobby__metric {
-    margin-bottom: 10px;
+  .hobby__index {
+    display: block;
+    margin-bottom: 22px;
     color: var(--gold);
-    font-size: 12px;
-    font-weight: 900;
-    text-transform: uppercase;
+    font: 700 12px var(--mono);
   }
-
-  .hobby__card h3 {
-    margin-bottom: 0;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 18px;
-    line-height: 1.2;
-  }
-
-  .hobby__card p {
-    color: #c9d7d6;
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 1.42;
-  }
-
-  .hobby__card footer {
+  .hobby__card p { margin-top: 12px; color: var(--muted); line-height: 1.65; }
+  .site-footer { border-top: 1px solid var(--line); }
+  .site-footer .wrap {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 16px;
+    padding-block: 12px;
     color: var(--muted);
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
+    font: 700 12px var(--mono);
   }
-
-  .hobby__card footer strong {
-    color: var(--cyan);
-    font-size: 12px;
+  .site-footer a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    color: var(--text);
+    text-decoration: none;
   }
-
-  @media (max-width: 980px) {
-    .hero,
-    .intro {
-      grid-template-columns: 1fr;
-    }
-
-    .hero {
-      min-height: auto;
-      padding-top: 108px;
-    }
-
-    .hero-visual img {
-      max-height: 520px;
-      object-fit: cover;
-    }
-
-    .facts-grid,
-    .hobby__grid {
-      grid-template-columns: 1fr;
-    }
-
-    .hobby__card {
-      min-height: 250px;
-    }
-  }
-
-  @media (max-width: 700px) {
-    .site-header {
-      position: absolute;
-      align-items: flex-start;
-      padding: 16px;
-    }
-
-    .logo__text {
-      display: none;
-    }
-
-    .site-header nav {
-      flex-wrap: wrap;
-    }
-
-    .site-header nav a {
-      min-height: 38px;
-      padding: 0 8px;
-      font-size: 11px;
-    }
-
-    .theme-toggle {
-      min-height: 38px;
-      padding: 0 8px;
-    }
-
-    .theme-toggle__text {
-      display: none;
-    }
-
-    .hero,
-    .section-band {
-      padding: 94px 20px 64px;
-    }
-
-    .hero__cta {
-      align-items: stretch;
-      flex-direction: column;
-    }
-
-    .hero-visual figcaption {
-      text-align: left;
-    }
-
-    .panel-topline {
-      flex-direction: column;
-    }
-
-    .fact-card,
-    .hobby__card {
-      border-radius: 14px;
-    }
-  }
-
-  /* Motion and typography share the existing light/dark color tokens. */
-  .reading-progress {
-    position: fixed;
-    z-index: 30;
-    inset: 0 0 auto;
-    height: 2px;
-    background: var(--cyan);
-    transform: scaleX(var(--progress, 0));
-    transform-origin: left;
-    pointer-events: none;
-  }
-
-  .hero { min-height: 80dvh; gap: 48px; padding-top: 150px; padding-bottom: 80px; }
-  .hero-motion { min-width: 0; }
-  .scroll-linked { transform-origin: center; }
-  .hobby__card.scroll-linked { transition: border-color 180ms ease, box-shadow 180ms ease; }
-  .intro, .hobby { background-position: 0 var(--grid-shift, 0px), 0 var(--grid-shift, 0px), 0 0; }
-  .section-band::after {
-    transform: scaleX(var(--section-progress, 0));
-    transform-origin: left;
-    height: 2px;
-  }
-  .section-band { min-height: auto; padding-top: 100px; padding-bottom: 100px; scroll-margin-top: 72px; }
-  h1 { font-size: 88px; line-height: 1.03; font-weight: 750; }
-  h1 span { display: block; margin-top: 24px; font-size: 38px; line-height: 1.2; font-weight: 450; color: var(--muted); }
-  h2 { font-size: 48px; line-height: 1.08; }
-  .hero__lead, .section-copy p { font-size: 18px; font-weight: 400; line-height: 1.75; }
-  .section-copy .eyebrow { font-size: 12px; font-weight: 700; color: var(--cyan); }
   @media (prefers-reduced-motion: no-preference) {
     .hero__copy { animation: arrival 800ms both; }
-    .hero-visual { animation: arrival 1000ms 120ms both; }
-    .hero-visual::after { animation: scan 3s 600ms ease-in-out; }
+    .cta { transition: transform 150ms, border-color 150ms, background 150ms; }
+    .cta:active { transform: translateY(1px); }
+    @media (hover: hover) and (pointer: fine) {
+      .cta:hover:not(:active) { transform: translateY(-1px); }
+    }
   }
-  .hero-visual img { border: 0; border-radius: 8px; box-shadow: none; }
-  .hero-visual::after {
-    content: ''; position: absolute; top: 0; bottom: 30px; left: 0; width: 1px;
-    background: var(--cyan); box-shadow: 0 0 18px var(--cyan); opacity: 0;
-    pointer-events: none;
-  }
-  .logo__mark, .cta, .profile-panel, .fact-card, .hobby__card { border-radius: 8px; }
-  .site-header nav a { position: relative; }
-  .site-header nav a::after {
-    content: ''; position: absolute; bottom: 3px; left: 12px; right: 12px; height: 2px;
-    background: var(--cyan); transform: scaleX(0); transition: transform 220ms;
-  }
-  .site-header nav a[aria-current]::after { transform: scaleX(1); }
-  .cta { gap: 16px; min-height: 48px; }
-  .cta--primary { background: var(--cyan); }
-  :global(html[data-theme='light']) .cta--primary { background: #00786e; }
-  .profile-panel { background: transparent; box-shadow: none; border: 0; padding: 0; }
-  :global(html[data-theme='light']) .profile-panel { background: transparent; box-shadow: none; border: 0; }
-  .facts-grid { border-top: 1px solid var(--line); padding-top: 28px; }
-  .fact-card { min-height: 104px; gap: 18px; box-shadow: none; }
-  .fact-card strong { font-size: 23px; font-weight: 550; }
-  .hobby__card { gap: 22px; min-height: 330px; box-shadow: none; }
-  .hobby__card p { font-size: 16px; font-weight: 400; line-height: 1.65; margin-bottom: 0; }
-  .hobby__card .hobby__metric { font-size: 11px; color: var(--gold); margin-bottom: 8px; }
-  .hobby__card::before {
-    content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0;
-    background: radial-gradient(240px circle at var(--pointer-x, 50%) var(--pointer-y, 50%), rgba(39,240,208,.12), transparent 80%);
-    transition: opacity 250ms;
-  }
-  .hobby__card:hover::before { opacity: 1; }
-  .hobby__dial { position: relative; background: none; border-color: var(--line); }
-  .hobby__dial::before { content: ''; position: absolute; inset: -1px; border: 2px solid transparent; border-top-color: var(--cyan); border-bottom-color: var(--gold); border-radius: 50%; transition: transform 900ms ease; }
-  .hobby__card:hover .hobby__dial::before { transform: rotate(180deg); }
-  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 700ms var(--reveal-delay) ease, transform 700ms var(--reveal-delay) cubic-bezier(.2,.7,.2,1); }
-  .reveal.is-visible { opacity: 1; transform: translateY(0); }
-  .site-footer { display: flex; justify-content: space-between; gap: 24px; padding: 32px 6%; border-top: 1px solid var(--line); font: 12px var(--mono); color: var(--muted); }
-  .site-footer a { color: var(--text); text-decoration: none; }
-  @keyframes arrival { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes scan { 0% { left: 0; opacity: 0; } 15%, 75% { opacity: .65; } 100% { left: 100%; opacity: 0; } }
-  @media (max-width: 980px) {
-    .hero { padding-top: 124px; min-height: auto; }
-    h1 { font-size: 72px; }
-    .hero-visual { max-width: 640px; width: 100%; }
-    .facts-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .fact-card strong { font-size: 20px; overflow-wrap: anywhere; }
-    .hobby__card { min-height: 280px; }
+  @keyframes arrival {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   @media (max-width: 700px) {
-    .site-header { position: sticky; align-items: center; gap: 8px; }
-    .site-header nav { gap: 0; }
-    .hero { padding-top: 40px; gap: 32px; }
-    h1 { font-size: 60px; }
-    h1 span { font-size: 28px; margin-top: 18px; }
-    h2 { font-size: 36px; }
-    .hero__lead, .section-copy p { font-size: 16px; }
-    .section-copy .eyebrow { font-size: 11px; }
-    .section-band { padding-top: 64px; padding-bottom: 64px; }
-    .facts-grid { grid-template-columns: 1fr; gap: 0; }
-    .fact-card { flex-direction: row; align-items: center; min-height: 80px; padding: 16px 0; border: 0; border-bottom: 1px solid var(--line); background: transparent !important; box-shadow: none !important; border-radius: 0; }
-    .fact-card span { flex: 0 0 100px; }
-    .fact-card strong { font-size: 18px; text-align: right; }
-    .site-footer { flex-wrap: wrap; }
+    .vlog-page { --header-height: 68px; }
+    .site-header { gap: 4px; }
+    .logo__text { display: none; }
+    nav { gap: 0; }
+    nav a { padding-inline: 6px; font-size: 11px; }
+    .hero__layout, .field-note__layout, .intro__layout, .hobby__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .hero__cta { flex-direction: column; }
+    .field-note { min-height: auto; }
   }
-  @media (prefers-reduced-motion: reduce) {
-    :global(html) { scroll-behavior: auto; }
-    .reveal { opacity: 1; transform: none; transition: none; }
-    .theme-toggle__thumb { transition: background 180ms ease; }
-    .cta { transition: border-color 180ms ease, background 180ms ease; }
-    .cta:hover, .cta:focus-visible { transform: none; }
-    .hobby__card { transition: border-color 180ms ease, box-shadow 180ms ease; }
-    .hobby__card:hover { transform: none; }
-    .hobby__dial::before, .site-header nav a::after { transition: none; }
-    .hobby__card:hover .hobby__dial::before { transform: none; }
+  @media (max-width: 360px) {
+    nav a { padding-inline: 4px; }
   }
 </style>
