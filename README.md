@@ -6,6 +6,8 @@ Edit the featured note in `src/components/Welcome.astro`. Keep it readable witho
 
 The field-note photo is served locally in three WebP widths (`public/bernina-express-*.webp`). If you replace it, update the responsive sources, alt text, and footer attribution together.
 
+The hero references React Bits’ [Split Text](https://reactbits.dev/text-animations/split-text) and [Dot Grid](https://reactbits.dev/backgrounds/dot-grid). The field-note headline adapts [Scroll Reveal](https://reactbits.dev/text-animations/scroll-reveal) as sequential color changes. These are native CSS interpretations, not React components.
+
 The field note uses a CSS view timeline for its headline accent and photo rule. The copy and photo stay visible without timeline support, and `prefers-reduced-motion` disables the entrance and scroll effects.
 
 ## 🚀 Project Structure

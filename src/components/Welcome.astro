@@ -58,11 +58,11 @@ const hobbies = [
       <div class="wrap hero__layout">
         <div class="hero__copy">
           <p class="eyebrow">Personal vlog · Age 11</p>
-          <h1>TT Vlog</h1>
+          <h1><span class="hero__word"><span>TT</span></span> <span class="hero__word"><span>Vlog</span></span></h1>
           <p class="hero__lead">I’m TT. This is where I write about my hobbies, the places I’d like to go, and the things I learn along the way.</p>
           <div class="hero__cta">
             <a class="cta cta--primary" href="#field-note">Read the latest note <span aria-hidden="true">↓</span></a>
-            <a class="cta" href="#hobby">Explore hobbies</a>
+            <a class="cta cta--secondary" href="#hobby">Explore hobbies</a>
           </div>
         </div>
         <MotionScene />
@@ -74,7 +74,7 @@ const hobbies = [
         <header class="field-note__header">
           <div>
             <p class="eyebrow">Field note 01 · Dream trip</p>
-            <h2 id="field-note-title">Aquariums and <span class="field-note__accent">mountain trains</span></h2>
+            <h2 id="field-note-title">Aquariums and <span class="field-note__accent">mountain</span> <span class="field-note__accent">trains</span></h2>
           </div>
           <p class="field-note__text">My dream trip has two stops: a train ride through the mountains and an afternoon at an aquarium. I’d bring my camera for both.</p>
         </header>
@@ -174,7 +174,7 @@ const hobbies = [
     --gold: #ffc84a;
     --coral: #ff6262;
     --line: #304744;
-    --grid: rgba(39, 240, 208, 0.045);
+    --hero-dot: rgba(39, 240, 208, 0.24);
     --button-ink: #06110f;
     --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --gutter: clamp(20px, 6vw, 76px);
@@ -193,7 +193,7 @@ const hobbies = [
     --gold: #8c5700;
     --coral: #c13c3c;
     --line: #acc9c6;
-    --grid: rgba(0, 110, 99, 0.08);
+    --hero-dot: rgba(0, 110, 99, 0.28);
     --button-ink: #fff;
   }
   .wrap {
@@ -278,7 +278,16 @@ const hobbies = [
 
   h1, h2, h3, p { margin: 0; }
   h1, h2 { line-height: 1.04; letter-spacing: -0.055em; }
-  h1 { font-size: clamp(56px, 8vw, 112px); }
+  h1 { font-size: clamp(56px, 8vw, 112px); font-weight: 750; }
+  .hero__word {
+    display: inline-block;
+    overflow: clip;
+    vertical-align: top;
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
+  }
+  .hero__word > span { display: block; }
+  .hero__word + .hero__word { color: var(--cyan); }
   h2 { font-size: clamp(36px, 5.2vw, 72px); }
   h3 { font-size: clamp(22px, 2.4vw, 30px); line-height: 1.15; letter-spacing: -0.035em; }
   .hero__lead, .section-copy > p:not(.eyebrow) {
@@ -296,16 +305,22 @@ const hobbies = [
     text-transform: uppercase;
   }
   .hero {
+    position: relative;
     display: grid;
     align-items: center;
     min-height: calc(100svh - var(--header-height));
     padding-block: clamp(32px, 6vh, 72px);
-    background:
-      linear-gradient(var(--grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
-      linear-gradient(135deg, var(--ink), var(--panel));
-    background-size: 36px 36px, 36px 36px, auto;
+    background: radial-gradient(ellipse at 74% 46%, color-mix(in srgb, var(--cyan) 10%, var(--panel)), var(--ink) 65%);
   }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, var(--hero-dot) 1px, transparent 1.5px) center / 24px 24px;
+    mask-image: radial-gradient(ellipse 53% 74% at 74% 46%, #000 24%, transparent 94%);
+    pointer-events: none;
+  }
+  .hero__layout { position: relative; }
   .hero__layout, .intro__layout {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -327,8 +342,10 @@ const hobbies = [
     text-decoration: none;
   }
   .cta--primary { background: var(--cyan); border-color: var(--cyan); color: var(--button-ink); }
+  .cta--secondary { background: transparent; border-color: transparent; }
   .cta:hover { border-color: var(--cyan); }
   .cta--primary:hover { background: color-mix(in srgb, var(--cyan) 90%, var(--text)); }
+  .cta--secondary:hover { border-color: transparent; text-decoration: underline; text-underline-offset: 4px; }
 
   .section-band {
     display: grid;
@@ -421,13 +438,15 @@ const hobbies = [
   .photo-credit { line-height: 1.5; }
   .photo-credit a { text-underline-offset: 3px; }
   @media (prefers-reduced-motion: no-preference) {
-    .hero__copy > * {
+    .hero__copy > :not(h1) {
       animation: arrival 650ms cubic-bezier(.22, 1, .36, 1) both;
     }
-    .hero__copy h1 { animation-delay: 65ms; }
+    .hero__word > span { animation: word-arrival 700ms cubic-bezier(.22, 1, .36, 1) both; }
+    .hero__word + .hero__word > span { animation-delay: 90ms; }
     .hero__copy > .hero__lead { animation-delay: 130ms; }
     .hero__copy > .hero__cta { animation-delay: 195ms; }
-    .hero__copy:focus-within > * { animation: none; }
+    .hero__copy:focus-within > *,
+    .hero__copy:focus-within .hero__word > span { animation: none; }
     .cta { transition: transform 150ms, border-color 150ms, background 150ms; }
     .cta:active { transform: translateY(1px); }
     .cta--primary span { transition: transform 150ms; }
@@ -456,19 +475,25 @@ const hobbies = [
         animation-timeline: --note-entry;
         animation-range: entry 0% entry 75%;
       }
+      .field-note__accent { animation-range: entry 20% entry 48%; }
+      .field-note__accent + .field-note__accent { animation-range: entry 40% entry 68%; }
     }
   }
   @keyframes arrival {
     from { opacity: .55; transform: translateY(14px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  @keyframes word-arrival {
+    from { transform: translateY(110%); }
+    to { transform: translateY(0); }
+  }
   @keyframes note-rule {
     from { transform: scaleX(0); }
     to { transform: scaleX(1); }
   }
   @keyframes note-accent {
-    0%, 25% { color: var(--text); }
-    80%, 100% { color: var(--cyan); }
+    from { color: var(--text); }
+    to { color: var(--cyan); }
   }
   @media (max-width: 700px) {
     .vlog-page { --header-height: 68px; }
@@ -476,6 +501,8 @@ const hobbies = [
     .logo__text { display: none; }
     nav { gap: 0; }
     nav a { padding-inline: 6px; font-size: 11px; }
+    .hero { background-position: center; background-image: radial-gradient(ellipse at 50% 72%, color-mix(in srgb, var(--cyan) 10%, var(--panel)), var(--ink) 69%); }
+    .hero::before { mask-image: radial-gradient(ellipse 74% 53% at 50% 72%, #000 16%, transparent 90%); }
     .hero__layout, .field-note__header, .intro__layout, .hobby__grid {
       grid-template-columns: minmax(0, 1fr);
     }
