@@ -6,7 +6,9 @@ Edit the featured note in `src/components/Welcome.astro`. Keep it readable witho
 
 The field-note photo is served locally in three WebP widths (`public/bernina-express-*.webp`). If you replace it, update the responsive sources, alt text, and footer attribution together.
 
-The hero references React Bits’ [Split Text](https://reactbits.dev/text-animations/split-text) and [Dot Grid](https://reactbits.dev/backgrounds/dot-grid). The field-note headline adapts [Scroll Reveal](https://reactbits.dev/text-animations/scroll-reveal) as sequential color changes. These are native CSS interpretations, not React components.
+The visual design references [Anime.js](https://animejs.com/): a warm graphite palette, an original orbit display, and a tick-mark playback strip. On desktop, the radar slider pauses the loop and [seeks](https://animejs.com/documentation/timeline/timeline-methods/seek/) within one cycle. Play continues from that point; Replay starts over.
+
+The hero’s word entrance and field-note headline still use native CSS interpretations of React Bits’ [Split Text](https://reactbits.dev/text-animations/split-text) and [Scroll Reveal](https://reactbits.dev/text-animations/scroll-reveal).
 
 CSS view timelines drive the field-note headline and photo rule, the profile fact scan, and the hobbies dial. The content stays visible without timeline support, and `prefers-reduced-motion` disables the entrance and scroll effects.
 

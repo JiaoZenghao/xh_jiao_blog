@@ -35,7 +35,7 @@ const hobbies = [
   <header class="site-header">
     <a class="logo" href="#hero" aria-label="TT Vlog home">
       <span class="logo__mark">TT</span>
-      <span class="logo__text">Vlog OS</span>
+      <span class="logo__text">Field journal</span>
     </a>
     <nav aria-label="Primary">
       {navItems.map((item) => (
@@ -73,7 +73,7 @@ const hobbies = [
       <article class="wrap">
         <header class="field-note__header">
           <div>
-            <p class="eyebrow">Field note 01 · Dream trip</p>
+            <p class="eyebrow">01 / Field note</p>
             <h2 id="field-note-title">Aquariums and <span class="field-note__accent">mountain</span> <span class="field-note__accent">trains</span></h2>
           </div>
           <p class="field-note__text">My dream trip has two stops: a train ride through the mountains and an afternoon at an aquarium. I’d bring my camera for both.</p>
@@ -99,7 +99,7 @@ const hobbies = [
     <section class="intro section-band" id="introduction">
       <div class="wrap intro__layout">
         <div class="section-copy">
-          <p class="eyebrow">Profile scan</p>
+          <p class="eyebrow">02 / Profile</p>
           <h2>Meet TT</h2>
           <p>I like exploring new places, trying new food, and learning cool facts. I write short stories about my day and keep photos of special moments.</p>
         </div>
@@ -117,7 +117,10 @@ const hobbies = [
     <section class="hobby section-band" id="hobby">
       <div class="wrap">
         <header class="hobby__heading">
-          <h2>Weekend hobbies</h2>
+          <div>
+            <p class="eyebrow">03 / Weekends</p>
+            <h2>Weekend hobbies</h2>
+          </div>
           <svg class="hobby__dial" viewBox="0 0 100 54" aria-hidden="true" fill="none" stroke-width="2" stroke-linecap="round">
             <path d="M8 47a42 42 0 0 1 84 0M16 28l5 3M50 15v6M84 28l-5 3"/>
             <path class="hobby__needle" d="M50 47V18"/>
@@ -173,16 +176,15 @@ const hobbies = [
   :global(*) { box-sizing: border-box; }
 
   .vlog-page {
-    --ink: #070b10;
-    --panel: #101923;
-    --text: #f3f7f4;
-    --muted: #a8baba;
-    --cyan: #27f0d0;
-    --gold: #ffc84a;
-    --coral: #ff6262;
-    --line: #304744;
-    --hero-dot: rgba(39, 240, 208, 0.24);
-    --button-ink: #06110f;
+    --ink: #23211f;
+    --panel: #2c2926;
+    --text: #faf3e8;
+    --muted: #c2b8ad;
+    --accent: #ff8269;
+    --gold: #ecca80;
+    --signal: #86bdb2;
+    --line: #514941;
+    --button-ink: #2d1914;
     --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --gutter: clamp(20px, 6vw, 76px);
     --measure: 1288px;
@@ -192,15 +194,14 @@ const hobbies = [
     font-family: system-ui, sans-serif;
   }
   :global(html[data-theme='light']) .vlog-page {
-    --ink: #f3fafb;
-    --panel: #e6f2f3;
-    --text: #102330;
-    --muted: #415d64;
-    --cyan: #006e63;
-    --gold: #8c5700;
-    --coral: #c13c3c;
-    --line: #acc9c6;
-    --hero-dot: rgba(0, 110, 99, 0.28);
+    --ink: #faf5ed;
+    --panel: #efe7da;
+    --text: #281f1a;
+    --muted: #64564b;
+    --accent: #a43522;
+    --gold: #805618;
+    --signal: #367971;
+    --line: #cbbdaf;
     --button-ink: #fff;
   }
   .wrap {
@@ -209,7 +210,7 @@ const hobbies = [
   }
   a { color: inherit; }
   :is(a, button):focus-visible {
-    outline: 2px solid var(--cyan);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
   }
   main, section { scroll-margin-top: var(--header-height); }
@@ -224,7 +225,7 @@ const hobbies = [
     min-height: 44px;
     padding-inline: 16px;
     border-radius: 8px;
-    background: var(--cyan);
+    background: var(--accent);
     color: var(--button-ink);
   }
   .skip-link:not(:focus) { clip-path: inset(50%); }
@@ -257,15 +258,15 @@ const hobbies = [
     width: 44px;
     aspect-ratio: 1;
     border: 1px solid var(--line);
-    border-radius: 8px;
-    color: var(--cyan);
+    border-radius: 4px;
+    color: var(--accent);
     font-size: 16px;
   }
   .logo__text { text-transform: uppercase; }
   nav { display: flex; gap: 8px; }
   nav a { padding-inline: 12px; }
   nav a:hover, .site-footer a:hover {
-    color: var(--cyan);
+    color: var(--accent);
     text-decoration: underline;
     text-underline-offset: 4px;
   }
@@ -274,10 +275,10 @@ const hobbies = [
     border: 1px solid var(--line);
     border-radius: 50%;
     background: var(--panel);
-    color: var(--cyan);
+    color: var(--accent);
     cursor: pointer;
   }
-  .theme-toggle:hover { border-color: var(--cyan); }
+  .theme-toggle:hover { border-color: var(--accent); }
   .theme-icon { width: 19px; height: 19px; }
   .theme-icon--moon,
   :global(html[data-theme='light']) .theme-icon--sun { display: none; }
@@ -294,7 +295,6 @@ const hobbies = [
     margin-bottom: -0.12em;
   }
   .hero__word > span { display: block; }
-  .hero__word + .hero__word { color: var(--cyan); }
   h2 { font-size: clamp(36px, 5.2vw, 72px); }
   h3 { font-size: clamp(22px, 2.4vw, 30px); line-height: 1.15; letter-spacing: -0.035em; }
   .hero__lead, .section-copy > p:not(.eyebrow) {
@@ -306,34 +306,24 @@ const hobbies = [
   }
   .eyebrow {
     margin-bottom: 16px;
-    color: var(--cyan);
+    color: var(--accent);
     font: 700 12px/1.5 var(--mono);
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
   .hero {
-    position: relative;
     display: grid;
     align-items: center;
     min-height: calc(100svh - var(--header-height));
     padding-block: clamp(32px, 6vh, 72px);
-    background: radial-gradient(ellipse at 74% 46%, color-mix(in srgb, var(--cyan) 10%, var(--panel)), var(--ink) 65%);
   }
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle, var(--hero-dot) 1px, transparent 1.5px) center / 24px 24px;
-    mask-image: radial-gradient(ellipse 53% 74% at 74% 46%, #000 24%, transparent 94%);
-    pointer-events: none;
-  }
-  .hero__layout { position: relative; }
   .hero__layout, .intro__layout {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: center;
     gap: clamp(28px, 5vw, 84px);
   }
+  .hero__layout { grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr); }
   .hero__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
   .cta {
     display: inline-flex;
@@ -343,15 +333,15 @@ const hobbies = [
     min-height: 48px;
     padding-inline: 16px;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 4px;
     background: var(--panel);
     font: 700 12px var(--mono);
     text-decoration: none;
   }
-  .cta--primary { background: var(--cyan); border-color: var(--cyan); color: var(--button-ink); }
+  .cta--primary { background: var(--accent); border-color: var(--accent); color: var(--button-ink); }
   .cta--secondary { background: transparent; border-color: transparent; }
-  .cta:hover { border-color: var(--cyan); }
-  .cta--primary:hover { background: color-mix(in srgb, var(--cyan) 90%, var(--text)); }
+  .cta:hover { border-color: var(--accent); }
+  .cta--primary:hover { background: color-mix(in srgb, var(--accent) 92%, var(--text)); }
   .cta--secondary:hover { border-color: transparent; text-decoration: underline; text-underline-offset: 4px; }
 
   .section-band {
@@ -429,15 +419,16 @@ const hobbies = [
   .hobby__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    border-block: 1px solid var(--line);
     margin-top: 32px;
   }
   .hobby__card {
     padding: clamp(20px, 3vw, 32px);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--panel);
+    min-width: 0;
   }
+  .hobby__card:first-child { padding-inline-start: 0; }
+  .hobby__card:last-child { padding-inline-end: 0; }
+  .hobby__card + .hobby__card { border-inline-start: 1px solid var(--line); }
   .hobby__index {
     display: block;
     margin-bottom: 22px;
@@ -495,7 +486,7 @@ const hobbies = [
         position: absolute;
         inset: auto 0 100%;
         height: 2px;
-        background: var(--cyan);
+        background: var(--accent);
         transform-origin: left;
         animation: note-rule 1ms linear both;
       }
@@ -514,7 +505,7 @@ const hobbies = [
         inset-block: 0;
         inset-inline-start: -1px;
         width: 2px;
-        background: var(--cyan);
+        background: var(--accent);
         transform-origin: top;
         animation: profile-scan 1ms linear both;
         animation-timeline: --profile-entry;
@@ -549,7 +540,7 @@ const hobbies = [
   }
   @keyframes note-accent {
     from { color: var(--text); }
-    to { color: var(--cyan); }
+    to { color: var(--accent); }
   }
   @keyframes profile-scan {
     from { transform: scaleY(0); }
@@ -557,7 +548,7 @@ const hobbies = [
   }
   @keyframes profile-label {
     from { color: var(--muted); }
-    to { color: var(--cyan); }
+    to { color: var(--accent); }
   }
   @keyframes hobby-sweep {
     from { transform: rotate(-62deg); }
@@ -569,12 +560,12 @@ const hobbies = [
     .logo__text { display: none; }
     nav { gap: 0; }
     nav a { padding-inline: 6px; font-size: 11px; }
-    .hero { background-position: center; background-image: radial-gradient(ellipse at 50% 72%, color-mix(in srgb, var(--cyan) 10%, var(--panel)), var(--ink) 69%); }
-    .hero::before { mask-image: radial-gradient(ellipse 74% 53% at 50% 72%, #000 16%, transparent 90%); }
     .hero__layout, .field-note__header, .intro__layout, .hobby__grid {
       grid-template-columns: minmax(0, 1fr);
     }
     .hero__cta { flex-direction: column; }
+    .hobby__card { padding-inline: 0; }
+    .hobby__card + .hobby__card { border-inline-start: 0; border-block-start: 1px solid var(--line); }
     .field-note__photo { aspect-ratio: 3 / 2; }
   }
   @media (max-width: 360px) {

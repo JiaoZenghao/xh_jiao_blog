@@ -5,27 +5,39 @@
     <div class="motion-ring motion-ring--inner"></div>
     <div class="motion-orbit"><span></span><span></span></div>
     <div class="motion-grid">
-      {Array.from({ length: 121 }, () => <span class="motion-cell" />)}
+      {Array.from({ length: 121 }, (_, i) => {
+        const column = i % 11;
+        const row = Math.floor(i / 11);
+        const distance = Math.hypot(column - 5, row - 5);
+        return distance <= 5.2 && (
+          <span
+            class:list={['motion-cell', { 'motion-cell--outer': distance > 4, 'motion-cell--middle': distance > 2 && distance <= 4 }]}
+            style={`grid-area:${row + 1}/${column + 1}`}
+            data-delay={Math.round(95 * distance)}
+          />
+        );
+      })}
     </div>
     <span class="motion-cross motion-cross--top">+</span>
     <span class="motion-cross motion-cross--bottom">+</span>
   </div>
-  <div class="motion-controls" hidden>
-    <span class="motion-label">TT / EXPLORER</span>
-    <button type="button" data-motion-pause>Pause animation</button>
-    <button type="button" data-motion-replay>Replay</button>
+  <div class="motion-controls" role="group" aria-label="Radar playback" hidden>
+    <button type="button" data-motion-pause aria-label="Pause radar">Pause</button>
+    <input class="motion-scrubber" data-motion-scrubber type="range" min="0" max="100" value="0" aria-label="Radar playback position" />
+    <button type="button" data-motion-replay aria-label="Replay radar">Replay</button>
   </div>
 </div>
 
 <script>
-  import { createTimeline, stagger } from 'animejs';
+  import { createTimeline } from 'animejs';
 
   const scene = document.querySelector('[data-motion-scene]')!;
   const controls = scene.querySelector<HTMLElement>('.motion-controls')!;
   const pause = scene.querySelector<HTMLButtonElement>('[data-motion-pause]')!;
   const replay = scene.querySelector<HTMLButtonElement>('[data-motion-replay]')!;
+  const scrubber = scene.querySelector<HTMLInputElement>('[data-motion-scrubber]')!;
   const allowMotion = matchMedia('(min-width: 701px) and (prefers-reduced-motion: no-preference)');
-  const cells = scene.querySelectorAll('.motion-cell');
+  const cells = scene.querySelectorAll<HTMLElement>('.motion-cell');
   let timeline: ReturnType<typeof createTimeline> | undefined;
   let manuallyPaused = false;
   let inView = false;
@@ -35,23 +47,32 @@
       controls.hidden = true;
       timeline?.revert();
       timeline = undefined;
+      scrubber.valueAsNumber = 0;
       return;
     }
+
+    timeline ??= createTimeline({
+      loop: true,
+      autoplay: false,
+      defaults: { ease: 'inOutSine' },
+      onUpdate: (animation) => {
+        const position = Math.round(animation.iterationProgress * 100);
+        if (scrubber.valueAsNumber !== position) scrubber.valueAsNumber = position;
+      },
+    }).add(cells, {
+      scale: [0.65, 1, 0.65],
+      opacity: [0.65, 1, 0.65],
+      duration: 2400,
+      delay: (cell: HTMLElement) => Number(cell.dataset.delay),
+    }, 0);
 
     controls.hidden = false;
-    pause.textContent = manuallyPaused ? 'Play animation' : 'Pause animation';
+    pause.textContent = manuallyPaused ? 'Play' : 'Pause';
+    pause.setAttribute('aria-label', manuallyPaused ? 'Play radar' : 'Pause radar');
     if (manuallyPaused || !inView || document.hidden) {
-      timeline?.pause();
+      timeline.pause();
       return;
     }
-
-    timeline ??= createTimeline({ loop: true, autoplay: false, defaults: { ease: 'inOutSine' } })
-      .add(cells, {
-        scale: [0.65, 1, 0.65],
-        opacity: [0.65, 1, 0.65],
-        duration: 2400,
-        delay: stagger(95, { grid: [11, 11], from: 'center' }),
-      }, 0);
     timeline.resume();
   }
 
@@ -59,9 +80,18 @@
     manuallyPaused = !manuallyPaused;
     syncPlayback();
   });
+  scrubber.addEventListener('input', () => {
+    if (!timeline) return;
+    if (!manuallyPaused) {
+      manuallyPaused = true;
+      syncPlayback();
+    }
+    timeline.seek(timeline.iterationDuration * scrubber.valueAsNumber / 100, true);
+  });
   replay.addEventListener('click', () => {
     manuallyPaused = false;
-    timeline?.seek(0);
+    scrubber.valueAsNumber = 0;
+    timeline?.seek(0, true);
     syncPlayback();
   });
   const observer = new IntersectionObserver(([entry]) => {
@@ -76,28 +106,61 @@
 
 <style>
   .motion-scene { min-width: 0; }
-  .motion-art { width: min(100%, 520px); aspect-ratio: 1; position: relative; margin: auto; }
+  .motion-art { width: min(100%, 575px, max(240px, 100svh - 245px)); aspect-ratio: 1; position: relative; margin: auto; }
   .motion-ring, .motion-ticks, .motion-orbit { position: absolute; border-radius: 50%; }
-  .motion-ring--outer { inset: 3%; border: 3px solid transparent; border-top-color: var(--cyan); border-right-color: var(--gold); border-bottom-color: var(--coral); }
+  .motion-ring--outer { inset: 3%; border: 2px solid transparent; border-top-color: var(--accent); border-right-color: var(--gold); border-bottom-color: var(--signal); }
   .motion-ring--outer::after { content: ''; position: absolute; inset: 9px; border: 1px solid var(--line); border-radius: 50%; }
-  .motion-ring--inner { inset: 12%; border: 7px solid transparent; border-top-color: var(--line); border-bottom-color: var(--cyan); opacity: .65; }
+  .motion-ring--inner { inset: 12%; border: 7px solid transparent; border-top-color: var(--line); border-bottom-color: var(--accent); opacity: .65; }
   .motion-ticks { inset: 7%; background: repeating-conic-gradient(var(--muted) 0deg 0.5deg, transparent 0.5deg 3deg); mask: radial-gradient(transparent 67%, black 67.5%, black 70%, transparent 70.5%); opacity: .55; }
   .motion-orbit { inset: 17%; border: 1px solid var(--line); }
-  .motion-orbit span { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: var(--coral); top: calc(50% - 5px); left: -5px; }
+  .motion-orbit span { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: var(--signal); top: calc(50% - 5px); left: -5px; }
   .motion-orbit span + span { left: auto; right: -5px; background: var(--gold); }
-  .motion-grid { position: absolute; inset: 26%; display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 5px; }
-  .motion-cell { display: block; aspect-ratio: 1; border-radius: 2px; background: var(--cyan); opacity: .65; }
-  .motion-cell:nth-child(3n) { background: var(--gold); }
-  .motion-cell:nth-child(5n) { background: var(--coral); }
+  .motion-grid { position: absolute; inset: 24%; display: grid; grid-template: repeat(11, minmax(0, 1fr)) / repeat(11, minmax(0, 1fr)); gap: 7px; }
+  .motion-cell { display: block; aspect-ratio: 1; border-radius: 50%; background: var(--accent); opacity: .65; }
+  .motion-cell--middle { background: var(--gold); }
+  .motion-cell--outer { background: var(--signal); }
   .motion-cross { position: absolute; font: 20px ui-monospace, monospace; color: var(--muted); }
   .motion-cross--top { top: 5%; right: 5%; }
   .motion-cross--bottom { bottom: 5%; left: 5%; }
-  .motion-controls:not([hidden]) { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; font: 11px var(--mono); color: var(--muted); }
-  button { color: var(--text); background: transparent; border: 1px solid var(--line); padding: 10px; min-height: 44px; border-radius: 4px; cursor: pointer; font: inherit; }
-  button:hover { border-color: var(--cyan); }
-  button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
+  .motion-controls:not([hidden]) {
+    display: grid;
+    grid-template-columns: 60px minmax(0, 1fr) 60px;
+    align-items: center;
+    gap: 8px;
+    width: min(100%, 420px);
+    margin: 12px auto 0;
+    padding: 4px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--panel);
+    color: var(--text);
+    font: 700 12px var(--mono);
+  }
+  button { color: inherit; background: transparent; border: 1px solid transparent; min-height: 44px; border-radius: 4px; cursor: pointer; font: inherit; }
+  button:hover { border-color: var(--line); color: var(--accent); }
+  :is(button, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .motion-scrubber {
+    --ticks: repeating-linear-gradient(90deg, var(--muted) 0 1px, transparent 1px 7px);
+    width: 100%;
+    height: 44px;
+    margin: 0;
+    appearance: none;
+    background: transparent;
+    cursor: ew-resize;
+  }
+  .motion-scrubber::-webkit-slider-runnable-track { height: 10px; background: var(--ticks); }
+  .motion-scrubber::-moz-range-track { height: 10px; background: var(--ticks); }
+  .motion-scrubber::-webkit-slider-thumb {
+    appearance: none;
+    width: 5px;
+    height: 20px;
+    margin-top: -5px;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+  .motion-scrubber::-moz-range-thumb { width: 5px; height: 20px; border: 0; border-radius: 2px; background: var(--accent); }
   @media (max-width: 700px) {
-    .motion-art { max-width: 260px; }
+    .motion-art { max-width: clamp(210px, 34svh, 290px); }
     .motion-grid { gap: 3px; }
   }
 </style>
